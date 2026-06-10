@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --warm-white: #fffbf5;
+  --dark: #1c1917;
+}
+
+body {
+  background: var(--warm-white);
+  color: var(--dark);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
