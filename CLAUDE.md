@@ -3,12 +3,13 @@
 ## Qué es Milo
 
 Plataforma web chilena de financiamiento colectivo para atención veterinaria.
-Conecta solicitantes vulnerables (RSH tramo 40% o inferior, validado con Clave
-Única) con veterinarias verificadas y donantes.
+Conecta solicitantes vulnerables (RSH tramo 40% o inferior, validado con la
+Cartola Hogar del RSH en PDF) con veterinarias verificadas y donantes.
 
 ## Tres roles de usuario
 
-- **solicitante**: dueño de mascota vulnerable. Se autentica SOLO con Clave Única.
+- **solicitante**: dueño de mascota vulnerable. Se registra con email/contraseña y
+  su RUT; su RSH se valida con la Cartola Hogar (PDF) al crear la campaña.
 - **veterinaria**: clínica registrada. Requiere verificación manual del equipo Milo.
 - **donante**: cualquier persona. Registro simple con email/Google.
 
@@ -69,8 +70,11 @@ Cuando una campaña cierra (fecha_limite alcanzada):
 
 ## Validaciones anti-fraude (nunca saltarse)
 
-1. RSH obtenido SOLO vía Clave Única OAuth — nunca aceptar PDF subido manualmente
-   por el solicitante.
+1. RSH validado con la **Cartola Hogar (PDF)** que sube el solicitante, con
+   validaciones automáticas server-side (ver `src/lib/cartola.ts`): el RUT de la
+   cartola coincide con el del registro, la cartola tiene < 90 días, el tramo es
+   ≤ 40%, y el PDF no fue editado (metadatos). *(Reemplazó a la integración con
+   Clave Única OAuth del diseño original — decisión del 2026-06-10.)*
 2. Presupuesto PDF debe ser subido por la VETERINARIA vinculada, no por el solicitante.
 3. La veterinaria debe confirmar el caso antes de que la campaña se active.
 4. El tramo RSH debe ser 40% o inferior — rechazar automáticamente si es mayor.
@@ -80,7 +84,7 @@ Cuando una campaña cierra (fecha_limite alcanzada):
 1. Feed público de campañas (sin login)
 2. Detalle de campaña + flujo de donación con Transbank sandbox
 3. Registro y login (los 3 roles)
-4. Creación de campaña (solicitante) con Clave Única
+4. Creación de campaña (solicitante) con validación de Cartola RSH (PDF)
 5. Panel veterinaria (confirmar casos)
 6. Cierre de campaña y regla del 70%
 7. Emails transaccionales

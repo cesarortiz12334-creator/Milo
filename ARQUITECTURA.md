@@ -22,17 +22,17 @@ flowchart LR
   SB[("Supabase<br/>Postgres + Auth + Storage")]
   TBK["Transbank<br/>Webpay Plus"]
   RS["Resend<br/>emails"]
-  CU["Clave Única<br/>OIDC Gobierno Digital"]
 
   UI -->|requests| MW --> SSR
   SSR <-->|RLS / service role| SB
   SSR -->|crear / commit| TBK
   SSR -->|notificar| RS
-  UI -->|login solicitante| CU
-  CU -->|callback| SSR
   CRON -->|cierra campañas| SB
   CRON -->|avisa| RS
 ```
+
+> El solicitante valida su RSH subiendo la **Cartola Hogar (PDF)**, que se procesa
+> server-side (`lib/cartola.ts`). Milo no integra Clave Única.
 
 **Claves de seguridad:** el navegador nunca habla directo con Supabase para datos
 sensibles (todo pasa por RLS o por el servidor con *service role*); las tarjetas
@@ -54,10 +54,11 @@ stateDiagram-v2
   no_financiada --> [*]: credito Milo o devolucion (72h)
 ```
 
-- **borrador → pendiente:** la crea el solicitante (verificado por Clave Única,
-  tramo RSH ≤ 40%). No se activa sola.
+- **borrador → pendiente:** la crea el solicitante, validando su **Cartola RSH
+  (PDF)**: RUT coincide, < 90 días, tramo ≤ 40%. No se activa sola.
 - **pendiente → activa:** la veterinaria **verificada** confirma el caso y sube el
-  presupuesto PDF. Recién ahí es pública y recibe donaciones.
+  presupuesto PDF. Recién ahí es pública y recibe donaciones. *(Las campañas
+  > $200.000 requieren además revisión manual del equipo Milo.)*
 - **activa → exitosa / no_financiada:** el cron diario aplica la **regla del 70%**
   al llegar la `fecha_limite`.
 - El `monto_meta` queda **congelado** una vez confirmada (trigger en BD).
@@ -106,17 +107,16 @@ src/
     campanas/nueva/           crear campaña (solicitante)
     veterinaria/              panel: confirmar casos
     mis-campanas/             campañas del solicitante
-    login, registro/          auth 3 roles
+    login, registro/          auth 3 roles (+ registro/solicitante)
     exitos/                   feed de éxitos
     api/webpay/               crear + retorno (Transbank)
-    api/auth/clave-unica/     inicio + callback (OIDC)
     api/cron/cerrar-campanas/ cierre regla 70% (protegido)
     auth/{callback,signout}/  OAuth Google + logout
   components/                 UI (CampanaCard, auth/, veterinaria/, campanas/…)
   lib/
     supabase/{client,server,admin,middleware,config}.ts
     transbank/  resend/  validaciones.ts  rate-limit.ts  seguridad.ts
-    auditoria.ts  cierre.ts  cerrar-campanas.ts  uploads.ts  storage.ts
+    cartola.ts  rut.ts  auditoria.ts  cierre.ts  uploads.ts  storage.ts
   middleware.ts               CSP + sesión + rate limit
-supabase/migrations/          001..006 (aplicar en orden)
+supabase/migrations/          001..007 (aplicar en orden)
 ```

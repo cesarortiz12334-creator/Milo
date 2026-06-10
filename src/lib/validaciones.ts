@@ -28,6 +28,19 @@ export const registroDonanteSchema = z.object({
   password: passwordNuevo,
 });
 
+export const registroSolicitanteSchema = z.object({
+  nombre: z.string().trim().min(1, "Ingresa tu nombre.").max(120),
+  email,
+  password: passwordNuevo,
+  rut: z
+    .string()
+    .trim()
+    .regex(
+      /^\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]$/,
+      "Ingresa un RUT válido (ej: 12.345.678-9)."
+    ),
+});
+
 export const registroVeterinariaSchema = z.object({
   email,
   password: passwordNuevo,

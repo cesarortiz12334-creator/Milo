@@ -17,11 +17,11 @@ const roles = [
     desc: "Clínica que atiende los casos. Requiere verificación del equipo Milo.",
   },
   {
-    href: "/api/auth/clave-unica/inicio",
-    externo: true,
+    href: "/registro/solicitante",
+    externo: false,
     emoji: "🐾",
     titulo: "Soy solicitante",
-    desc: "Necesito ayuda para mi mascota. Ingreso con Clave Única.",
+    desc: "Necesito ayuda para la atención de mi mascota.",
   },
 ];
 

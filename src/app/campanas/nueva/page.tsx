@@ -52,8 +52,7 @@ export default async function NuevaCampanaPage() {
           {!configurado && <AvisoSupabase />}
           {configurado && !puedeCrear ? (
             <Mensaje tipo="error">
-              Solo los solicitantes verificados con Clave Única pueden crear
-              campañas.
+              Solo los solicitantes pueden crear campañas.
             </Mensaje>
           ) : (
             <NuevaCampanaForm

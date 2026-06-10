@@ -1,7 +1,7 @@
 # Milo 🐾
 
 Plataforma web chilena de **financiamiento colectivo para atención veterinaria**.
-Conecta a personas vulnerables (acreditadas con RSH vía Clave Única) con
+Conecta a personas vulnerables (acreditadas con su Cartola Hogar del RSH) con
 veterinarias verificadas y donantes que quieran ayudar.
 
 > **Estado: MVP completo (8/8 módulos) + hardening de seguridad.** Corre y se
@@ -14,15 +14,15 @@ veterinarias verificadas y donantes que quieran ayudar.
 
 | Documento | Para qué |
 |---|---|
-| **[DEPLOY.md](DEPLOY.md)** | Paso a paso para dejarlo en producción (Supabase, Clave Única, Resend, Vercel, Upstash). Sigue esto. |
+| **[DEPLOY.md](DEPLOY.md)** | Paso a paso para dejarlo en producción (Supabase, Resend, Vercel, Upstash). Sigue esto. |
 | **[TESTING.md](TESTING.md)** | Casos que debes probar antes de salir a producción. |
 | **[ARQUITECTURA.md](ARQUITECTURA.md)** | Diagramas: sistema, ciclo de campaña, flujo de donación. |
 | **[.env.example](.env.example)** | Todas las variables de entorno, documentadas. |
 | **[CLAUDE.md](CLAUDE.md)** | Reglas de negocio y de seguridad del proyecto. |
 
 **Objetivo:** abre el repo, lee este README, sigue `DEPLOY.md` y deberías tener
-Milo en producción en menos de un día. Lo único con plazo externo es Clave Única
-(trámite con el Estado — ver DEPLOY.md §4).
+Milo en producción en menos de un día. Sin trámites externos lentos: el RSH del
+solicitante se valida con su **Cartola Hogar en PDF** (ver DEPLOY.md §4).
 
 ## Inicio rápido (local)
 
@@ -56,10 +56,11 @@ campañas y los emails quedan deshabilitados con un aviso.
 ## Qué está hecho
 
 Los 8 módulos del MVP: feed público, detalle + donación (Transbank), auth 3 roles
-(donante email/Google · veterinaria con verificación · solicitante con Clave
-Única), creación de campaña con anti-fraude (RSH ≤ 40%), panel veterinaria
-(presupuesto + confirmar), cierre con **regla del 70%** + opciones de devolución
-(72h), emails transaccionales y feed de éxitos.
+(donante email/Google · veterinaria con verificación · solicitante con email +
+**validación de Cartola RSH en PDF**), creación de campaña con anti-fraude
+(RUT coincide · cartola < 90 días · tramo ≤ 40% · revisión manual > $200.000),
+panel veterinaria (presupuesto + confirmar), cierre con **regla del 70%** +
+opciones de devolución (72h), emails transaccionales y feed de éxitos.
 
 **Hardening de seguridad** (ver `CLAUDE.md` y el historial de commits): cabeceras
 + CSP, validación Zod, rate limiting, verificación real de archivos, log de
@@ -68,12 +69,12 @@ auditoría inmutable, anti-CSRF, idempotencia de pagos, expiración por inactivi
 ## Qué falta para producción (resumen)
 
 Detalle completo en [DEPLOY.md §8](DEPLOY.md). Lo esencial:
-1. Conectar Supabase real + aplicar migraciones **001→006** + crear buckets.
+1. Conectar Supabase real + aplicar migraciones **001→007** + crear buckets.
 2. Implementar los `TODO(Supabase)` (persistir donaciones, sumar a
-   `monto_recaudado`, sesión de Clave Única + verificación RSH, transferencia a la
-   vet, leer el detalle de campaña desde datos reales).
-3. Configurar Resend (dominio), Clave Única (Gobierno Digital), Transbank
-   producción, `CRON_SECRET`, y (recomendado) Upstash para el rate limit.
+   `monto_recaudado`, transferencia a la vet, leer el detalle de campaña desde
+   datos reales) y **calibrar `src/lib/cartola.ts` con cartolas RSH reales**.
+3. Configurar Resend (dominio), Transbank producción, `CRON_SECRET`, y
+   (recomendado) Upstash para el rate limit.
 
 ## Estructura
 
@@ -81,7 +82,7 @@ Detalle completo en [DEPLOY.md §8](DEPLOY.md). Lo esencial:
 src/app/         rutas (App Router) + api/
 src/components/  UI
 src/lib/         supabase/ transbank/ resend/ + lógica (cierre, validaciones, …)
-supabase/migrations/  SQL 001..006 (aplicar en orden)
+supabase/migrations/  SQL 001..007 (aplicar en orden)
 ```
 
 ---

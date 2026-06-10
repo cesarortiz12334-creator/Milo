@@ -6,7 +6,10 @@ funciona contra el sandbox sin backend.
 
 > Para preparar datos: crea al menos un usuario **veterinaria** y márcalo como
 > `verificada = true` (tabla `veterinarias`, vía SQL Editor con service role), y
-> un **solicitante** con `rsh_verificado_at` seteado y `rsh_tramo <= 40`.
+> un **solicitante** (registro con email/contraseña + RUT). Ten a mano una
+> **Cartola Hogar del RSH** real (tramo ≤ 40%) cuyo RUT coincida con el del
+> solicitante. **Antes de probar, calibra los patrones de `src/lib/cartola.ts`
+> con esa cartola** (ver DEPLOY.md §4).
 
 ---
 
@@ -30,24 +33,32 @@ funciona contra el sandbox sin backend.
 
 ---
 
-## 2. Creación de campaña — RSH válido e inválido
+## 2. Creación de campaña — validación de Cartola RSH
 
-**Caso válido** (solicitante con `rsh_verificado_at` y `rsh_tramo <= 40`)
+**Caso válido**
 1. Login como solicitante → **Crear campaña**.
-2. Completa mascota + campaña, elige veterinaria, sube foto (JPG/PNG ≤ 5MB).
+2. Completa mascota + campaña, elige veterinaria, sube **la Cartola Hogar (PDF)**
+   con RUT coincidente, vigente y tramo ≤ 40%. (Foto opcional.)
 3. Enviar.
 
-**Esperado:** campaña creada en estado **`pendiente`**; redirige a *Mis campañas*
-con el aviso; llega email a la veterinaria (si Resend está configurado).
+**Esperado:** campaña creada en estado **`pendiente`**; `solicitantes.validacion_estado
+= 'auto_aprobada'` y se guardan `rut_extraido`/`tramo_extraido`/`fecha_emision_cartola`;
+redirige a *Mis campañas*; email a la veterinaria (si Resend está configurado).
 
 **Casos inválidos (deben ser RECHAZADOS):**
-- Solicitante con `rsh_tramo > 40` → "Tu tramo RSH debe ser 40% o inferior…".
-- Solicitante sin `rsh_verificado_at` → "Tu RSH aún no está verificado…".
+- Cartola con **RUT distinto** al del registro → "El RUT de la cartola no coincide…".
+- Cartola con **más de 90 días** → "Tu cartola está vencida, descarga una nueva…".
+- Cartola con **tramo > 40%** → "Tu tramo RSH es N%. … debe ser 40% o inferior".
+- PDF **editado** (Producer = Acrobat/Word) → "La cartola parece editada…".
+- Subir como cartola algo que **no es PDF real** (ej. `.exe` renombrado) →
+  rechazado por verificación de contenido (magic bytes).
 - Intentar una **segunda** campaña teniendo una `activa`/`pendiente` → "Ya tienes
   una campaña activa o pendiente…".
-- Subir un archivo que **no** sea imagen real (ej. un `.exe` renombrado a `.png`)
-  → rechazado por verificación de contenido (magic bytes).
 - Monto > $50.000.000 → rechazado por validación (Zod).
+
+**Revisión manual:** crea una campaña con meta **> $200.000** → queda
+`requiere_revision_manual = true`; tras confirmarla la vet, **no** pasa a `activa`
+hasta que el equipo Milo la apruebe (`revision_manual_aprobada = true`).
 
 ---
 

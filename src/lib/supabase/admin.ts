@@ -2,7 +2,7 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 /**
  * Cliente Supabase con SERVICE ROLE (omite RLS). SOLO para código de servidor
- * privilegiado: cierre de campañas, back-office, Clave Única. NUNCA exponer la
+ * privilegiado: cierre de campañas, emails, back-office. NUNCA exponer la
  * service role key al cliente.
  */
 export function isAdminConfigured(): boolean {

@@ -42,11 +42,24 @@ export async function confirmarCaso(
     .eq("user_id", user.id)
     .single();
   const vet = vetData as { verificada: boolean } | null;
-
   if (!vet) return { error: "Solo las veterinarias pueden confirmar casos." };
   if (!vet.verificada) {
     return { error: "Tu veterinaria aún no está verificada por el equipo Milo." };
   }
+
+  // Trae el caso (asignado a esta vet y pendiente) para decidir si requiere
+  // revisión manual del equipo Milo antes de publicarse.
+  const { data: campData } = await supabase
+    .from("campanas")
+    .select("requiere_revision_manual, revision_manual_aprobada")
+    .eq("id", campanaId)
+    .eq("veterinaria_id", user.id)
+    .eq("estado", "pendiente")
+    .single();
+  const camp = campData as
+    | { requiere_revision_manual: boolean; revision_manual_aprobada: boolean }
+    | null;
+  if (!camp) return { error: "No encontramos el caso o ya fue procesado." };
 
   // Presupuesto: tipo, tamaño y CONTENIDO real (PDF sin JavaScript embebido).
   const presupuesto = formData.get("presupuesto");
@@ -58,7 +71,6 @@ export async function confirmarCaso(
   const errContenido = await verificarContenidoArchivo(presupuesto, TIPOS_PDF);
   if (errContenido) return { error: errContenido };
 
-  // Sube al bucket privado 'documentos' (carpeta de la vet).
   const ruta = `${user.id}/${campanaId}/${crypto.randomUUID()}-${presupuesto.name}`;
   const { error: upErr } = await supabase.storage
     .from("documentos")
@@ -67,10 +79,19 @@ export async function confirmarCaso(
     return { error: "No pudimos subir el presupuesto. Intenta de nuevo." };
   }
 
-  // Activa la campaña (RLS exige veterinaria_id = auth.uid; solo si 'pendiente').
+  // Si requiere revisión manual y aún no está aprobada, NO se publica: queda
+  // pendiente con la confirmación de la vet registrada (vet_confirmo_at).
+  const bloqueadaPorRevision =
+    camp.requiere_revision_manual && !camp.revision_manual_aprobada;
+  const nuevoEstado = bloqueadaPorRevision ? "pendiente" : "activa";
+
   const { error: cErr } = await supabase
     .from("campanas")
-    .update({ estado: "activa", presupuesto_url: ruta })
+    .update({
+      estado: nuevoEstado,
+      presupuesto_url: ruta,
+      vet_confirmo_at: new Date().toISOString(),
+    })
     .eq("id", campanaId)
     .eq("veterinaria_id", user.id)
     .eq("estado", "pendiente");
@@ -79,14 +100,21 @@ export async function confirmarCaso(
   await registrarAuditoria("caso_confirmado", {
     actorId: user.id,
     campanaId,
+    detalle: { revision_manual: bloqueadaPorRevision },
   });
 
-  try {
-    await notificarCampanaActiva(campanaId);
-  } catch {
-    // El email es best-effort.
+  if (!bloqueadaPorRevision) {
+    try {
+      await notificarCampanaActiva(campanaId);
+    } catch {
+      // El email es best-effort.
+    }
   }
 
   revalidatePath("/veterinaria");
-  return { message: "Caso confirmado: la campaña ya está activa. 🎉" };
+  return {
+    message: bloqueadaPorRevision
+      ? "Caso confirmado. Como la campaña supera $200.000, queda en revisión del equipo Milo antes de publicarse."
+      : "Caso confirmado: la campaña ya está activa. 🎉",
+  };
 }

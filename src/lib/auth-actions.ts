@@ -6,9 +6,11 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 import {
   loginSchema,
   registroDonanteSchema,
+  registroSolicitanteSchema,
   registroVeterinariaSchema,
   parsearFormData,
 } from "@/lib/validaciones";
+import { rutValido, hashRut } from "@/lib/rut";
 import { ipActual } from "@/lib/seguridad";
 import { rateLimit, MINUTO } from "@/lib/rate-limit";
 
@@ -70,6 +72,42 @@ export async function registrarDonante(
       email,
       password,
       options: { data: { role: "donante", nombre } },
+    });
+    if (error) return { error: error.message };
+    if (data.session) redirect("/");
+  } catch {
+    return { error: "No pudimos crear tu cuenta. Intenta de nuevo." };
+  }
+
+  return { message: "¡Listo! Te enviamos un correo para confirmar tu cuenta." };
+}
+
+export async function registrarSolicitante(
+  _prev: AuthState,
+  formData: FormData
+): Promise<AuthState> {
+  if (!isSupabaseConfigured()) return NO_CONFIGURADO;
+
+  const ip = await ipActual();
+  if (!rateLimit(`registro:${ip}`, 5, 60 * MINUTO).ok) {
+    return { error: "Demasiados intentos. Espera un momento." };
+  }
+
+  const parsed = parsearFormData(registroSolicitanteSchema, formData);
+  if (!parsed.ok) return { error: parsed.error };
+  const { nombre, email, password, rut } = parsed.data;
+
+  if (!rutValido(rut)) {
+    return { error: "El RUT no es válido (revisa el dígito verificador)." };
+  }
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      // Solo se envía el RUT HASHEADO; el RUT en claro nunca se guarda en auth.
+      options: { data: { role: "solicitante", nombre, rut_hash: hashRut(rut) } },
     });
     if (error) return { error: error.message };
     if (data.session) redirect("/");

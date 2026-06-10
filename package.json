@@ -16,6 +16,7 @@
     "react-dom": "^19.0.0",
     "resend": "^6.12.4",
     "transbank-sdk": "^6.1.1",
+    "unpdf": "^1.6.2",
     "zod": "^4.4.3"
   },
   "devDependencies": {

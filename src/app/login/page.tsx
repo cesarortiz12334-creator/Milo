@@ -9,9 +9,9 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; cu?: string; expirada?: string }>;
+  searchParams: Promise<{ error?: string; expirada?: string }>;
 }) {
-  const { error, cu, expirada } = await searchParams;
+  const { error, expirada } = await searchParams;
   const configurado = isSupabaseConfigured();
 
   return (
@@ -27,17 +27,6 @@ export default async function LoginPage({
           No pudimos completar el inicio de sesión. Intenta de nuevo.
         </Mensaje>
       )}
-      {cu === "no_configurado" && (
-        <Mensaje tipo="error">
-          Clave Única aún no está configurada (faltan credenciales de Gobierno
-          Digital).
-        </Mensaje>
-      )}
-      {cu === "error" && (
-        <Mensaje tipo="error">
-          Hubo un problema con Clave Única. Intenta nuevamente.
-        </Mensaje>
-      )}
 
       <LoginForm configurado={configurado} />
 
@@ -47,18 +36,6 @@ export default async function LoginPage({
       </div>
 
       <GoogleButton configurado={configurado} />
-
-      <div className="rounded-xl border border-black/10 p-3 text-center">
-        <a
-          href="/api/auth/clave-unica/inicio"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-dark px-4 py-2.5 text-sm font-bold text-white transition hover:bg-dark/90"
-        >
-          <span aria-hidden="true">🪪</span> Ingresar con Clave Única
-        </a>
-        <p className="mt-2 text-xs text-muted">
-          Si eres <strong>solicitante</strong>, ingresa con Clave Única.
-        </p>
-      </div>
 
       <p className="text-center text-sm text-muted">
         ¿No tienes cuenta?{" "}

@@ -76,9 +76,9 @@ async function obtenerMisCampanas(userId: string): Promise<FilaCampana[]> {
 export default async function MisCampanasPage({
   searchParams,
 }: {
-  searchParams: Promise<{ creada?: string }>;
+  searchParams: Promise<{ creada?: string; revision?: string }>;
 }) {
-  const { creada } = await searchParams;
+  const { creada, revision } = await searchParams;
   const configurado = isSupabaseConfigured();
 
   let campanas: FilaCampana[];
@@ -114,6 +114,9 @@ export default async function MisCampanasPage({
             <Mensaje tipo="ok">
               ¡Campaña creada! Queda pendiente hasta que la veterinaria confirme
               el caso.
+              {revision
+                ? " Como supera $200.000, además pasará por revisión del equipo Milo antes de publicarse."
+                : ""}
             </Mensaje>
           )}
           {!configurado && <AvisoSupabase />}

@@ -3,8 +3,8 @@
 Paso a paso, **en orden**, para llevar Milo de "modo demo" a producción real. Al
 terminar, marca el [checklist final](#9-checklist-final-antes-de-producción).
 
-Tiempo estimado: medio día (la parte lenta es Clave Única, que depende de un
-trámite con el Estado — ver §4).
+Tiempo estimado: unas horas. **Ya no hay trámites con el Estado**: el solicitante
+valida su RSH subiendo su Cartola Hogar en PDF (ver §4).
 
 > **Convención:** `<...>` = reemplazar por tu valor. Todas las variables de
 > entorno están descritas en [`.env.example`](.env.example).
@@ -28,6 +28,7 @@ trámite con el Estado — ver §4).
    004_panel_veterinaria.sql→ RLS panel vet + storage de presupuestos
    005_cierre.sql           → cerrada_at, RLS donante, regla 70%
    006_seguridad.sql        → tabla auditoría inmutable + trigger monto inmutable
+   007_cartola_rsh.sql      → cartola RSH del solicitante + revisión manual >$200k
    ```
    Opción B (CLI): `npx supabase link --project-ref <ref>` y luego
    `npx supabase db push`.
@@ -71,27 +72,27 @@ Sin Resend, la app funciona pero los emails solo se registran en consola.
 
 ---
 
-## 4. Clave Única (login de solicitantes) ⚠️ trámite con el Estado
+## 4. Validación del RSH por Cartola Hogar (PDF) — sin trámite con el Estado
 
-> **Importante / honesto:** Clave Única está pensada para **instituciones del
-> Estado**. Una plataforma privada normalmente **no obtiene credenciales
-> directas**; suele requerir convenio con una institución pública habilitada o
-> integrarse mediante un intermediario autorizado. **Confirma elegibilidad antes
-> de prometer este flujo.** Alternativa si no calificas: usar un proveedor de
-> verificación de identidad/KYC chileno y validar el RUT/RSH por otra vía.
+El solicitante se registra con email/contraseña + su RUT. Al crear una campaña
+sube su **Cartola Hogar del RSH** en PDF, y el servidor la valida automáticamente
+(`src/lib/cartola.ts`):
 
-Si eres elegible:
+1. El PDF no debe venir de un editor común (metadatos Producer/Creator).
+2. El RUT de la cartola debe coincidir con el del registro.
+3. La cartola debe tener **menos de 90 días**.
+4. El **tramo debe ser ≤ 40%**.
 
-1. Revisa la documentación oficial: **https://digital.gob.cl** (Clave Única para
-   integradores) y el portal de integración de Gobierno Digital.
-2. Solicita la integración entregando, entre otros: datos de la institución y la
-   **`redirect_uri`** = `https://<tu-dominio>/api/auth/clave-unica/callback`.
-3. Te entregan **`client_id`** y **`client_secret`** → `CLAVE_UNICA_CLIENT_ID` /
-   `CLAVE_UNICA_CLIENT_SECRET`. Los endpoints ya están configurados por defecto.
-4. **Completa el código pendiente** en
-   `src/app/api/auth/clave-unica/callback/route.ts` (marcado con `TODO(Supabase)`):
-   crear/iniciar la sesión del solicitante con service role, guardar `rut_hash`, y
-   gatillar la **verificación del tramo RSH** (debe ser ≤ 40%). Ver [TESTING.md](TESTING.md).
+> El solicitante descarga su cartola **gratis** en **https://ventanillaunicasocial.gob.cl**
+> con **su propia** Clave Única (no la de Milo). Milo no integra Clave Única.
+
+> ⚠️ **CALIBRACIÓN OBLIGATORIA:** los patrones de extracción de RUT, fecha y tramo
+> en `src/lib/cartola.ts` son SUPUESTOS (no hubo cartola de muestra al construir).
+> **Debes verificarlos y ajustarlos con cartolas reales** antes de producción, y
+> revisar el `Producer` real del PDF del Estado para pasar a una *allowlist*.
+> Recomendado: además, verificar el código/QR de la cartola contra el sistema del
+> Estado (la validación más robusta). El control de revisión manual de campañas
+> > $200.000 es el segundo filtro mientras calibras.
 
 ---
 
@@ -154,8 +155,12 @@ La capa demo funciona, pero estos puntos deben completarse para producción real
   y sumar al `monto_recaudado` de la campaña (service role).
 - `src/lib/cerrar-campanas.ts` → transferir los fondos a la veterinaria al cerrar
   una campaña exitosa (back-office / integración bancaria).
-- `src/app/api/auth/clave-unica/callback/route.ts` → crear sesión del solicitante
-  + verificación del tramo RSH.
+- `src/lib/cartola.ts` → **calibrar los patrones de extracción** (RUT, fecha,
+  tramo) y la firma del PDF (Producer) con cartolas RSH reales; idealmente añadir
+  verificación del código/QR contra el sistema del Estado.
+- Revisión manual de campañas > $200.000: falta la acción de back-office del equipo
+  Milo que apruebe (`campanas.revision_manual_aprobada = true`) y active la campaña
+  una vez confirmada por la vet.
 - `src/app/campana/[id]/page.tsx` → leer la campaña real desde la vista
   `campanas_publicas` (hoy usa datos mock).
 
@@ -163,12 +168,12 @@ La capa demo funciona, pero estos puntos deben completarse para producción real
 
 ## 9. Checklist final antes de producción
 
-- [ ] Migraciones **001→006** aplicadas y verificadas en Supabase.
+- [ ] Migraciones **001→007** aplicadas y verificadas en Supabase.
 - [ ] Buckets `mascotas` (público) y `documentos` (privado) existen.
 - [ ] RLS activo en todas las tablas (incluida `auditoria`).
 - [ ] Email + Google habilitados en Supabase Auth; redirect URLs en la allowlist.
 - [ ] Dominio verificado en Resend; `RESEND_API_KEY` + `MILO_FROM_EMAIL` cargadas.
-- [ ] Clave Única configurada (o definida la alternativa de verificación).
+- [ ] Patrones de `src/lib/cartola.ts` **calibrados con cartolas RSH reales**.
 - [ ] `TBK_ENVIRONMENT=production` con commerce code + api key reales.
 - [ ] `CRON_SECRET` cargada; cron visible en Vercel → Settings → Cron Jobs.
 - [ ] `NEXT_PUBLIC_SITE_URL` apunta al dominio real.

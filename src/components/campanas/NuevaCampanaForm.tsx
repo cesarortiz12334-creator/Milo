@@ -3,7 +3,7 @@
 import { useActionState, useState, type ChangeEvent } from "react";
 import { crearCampana, type CampanaState } from "@/app/campanas/nueva/actions";
 import { Campo, Select, TextArea, Mensaje, BTN_PRIMARIO } from "@/components/auth/campos";
-import { validarArchivo, TIPOS_IMAGEN, MAX_MB } from "@/lib/uploads";
+import { validarArchivo, TIPOS_IMAGEN, TIPOS_PDF, MAX_MB } from "@/lib/uploads";
 import type { VeterinariaOpcion } from "@/lib/mock/veterinarias";
 
 const inicial: CampanaState = {};
@@ -17,12 +17,15 @@ export default function NuevaCampanaForm({
 }) {
   const [state, action, pending] = useActionState(crearCampana, inicial);
   const [fotoError, setFotoError] = useState<string | null>(null);
+  const [cartolaError, setCartolaError] = useState<string | null>(null);
 
   function onFoto(e: ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
-    setFotoError(
-      f ? validarArchivo(f, { tipos: TIPOS_IMAGEN, maxMB: MAX_MB }) : null
-    );
+    setFotoError(f ? validarArchivo(f, { tipos: TIPOS_IMAGEN, maxMB: MAX_MB }) : null);
+  }
+  function onCartola(e: ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    setCartolaError(f ? validarArchivo(f, { tipos: TIPOS_PDF, maxMB: MAX_MB }) : null);
   }
 
   return (
@@ -59,6 +62,30 @@ export default function NuevaCampanaForm({
           />
         </label>
         {fotoError && <Mensaje tipo="error">{fotoError}</Mensaje>}
+      </fieldset>
+
+      <fieldset className="space-y-3">
+        <legend className="font-heading text-lg font-bold text-dark">
+          Tu Registro Social de Hogares
+        </legend>
+        <p className="text-sm text-muted">
+          Sube tu <strong>Cartola Hogar del RSH</strong> en PDF. La descargas
+          gratis en <strong>ventanillaunicasocial.gob.cl</strong> con tu Clave
+          Única. Validamos automáticamente tu RUT, la vigencia y el tramo (debe ser
+          40% o inferior).
+        </p>
+        <label className="block text-sm font-semibold text-dark">
+          Cartola Hogar (PDF, máx. {MAX_MB}MB)
+          <input
+            type="file"
+            name="cartola"
+            accept="application/pdf"
+            onChange={onCartola}
+            required
+            className="mt-1 block w-full text-sm text-muted file:mr-3 file:rounded-full file:border-0 file:bg-primary-soft file:px-4 file:py-2 file:font-heading file:text-sm file:font-bold file:text-primary"
+          />
+        </label>
+        {cartolaError && <Mensaje tipo="error">{cartolaError}</Mensaje>}
       </fieldset>
 
       <fieldset className="space-y-3">
@@ -103,14 +130,15 @@ export default function NuevaCampanaForm({
       <p className="rounded-xl border border-primary/30 bg-primary-soft/30 p-3 text-sm text-dark">
         El <strong>presupuesto</strong> lo sube tu veterinaria, no tú. Tu campaña
         quedará <strong>pendiente</strong> hasta que la veterinaria confirme el
-        caso; recién entonces se publica.
+        caso. Las campañas sobre <strong>$200.000</strong> pasan además por una
+        revisión del equipo Milo antes de publicarse.
       </p>
 
       {state.error && <Mensaje tipo="error">{state.error}</Mensaje>}
 
       <button
         type="submit"
-        disabled={pending || !configurado || !!fotoError}
+        disabled={pending || !configurado || !!fotoError || !!cartolaError}
         className={BTN_PRIMARIO}
       >
         {pending ? "Creando…" : "Crear campaña"}
