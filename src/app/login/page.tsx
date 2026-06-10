@@ -9,14 +9,19 @@ import { isSupabaseConfigured } from "@/lib/supabase/config";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; cu?: string }>;
+  searchParams: Promise<{ error?: string; cu?: string; expirada?: string }>;
 }) {
-  const { error, cu } = await searchParams;
+  const { error, cu, expirada } = await searchParams;
   const configurado = isSupabaseConfigured();
 
   return (
     <AuthShell titulo="Ingresar a Milo" subtitulo="Qué bueno verte de vuelta.">
       {!configurado && <AvisoSupabase />}
+      {expirada && (
+        <Mensaje tipo="error">
+          Tu sesión se cerró por inactividad. Vuelve a ingresar.
+        </Mensaje>
+      )}
       {error === "auth" && (
         <Mensaje tipo="error">
           No pudimos completar el inicio de sesión. Intenta de nuevo.

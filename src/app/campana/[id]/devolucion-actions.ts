@@ -3,6 +3,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { ventanaDevolucionVigente } from "@/lib/cierre";
+import { campanaIdSchema, parsearFormData } from "@/lib/validaciones";
+import { registrarAuditoria } from "@/lib/auditoria";
 
 export interface DevolucionState {
   error?: string;
@@ -21,8 +23,9 @@ export async function solicitarDevolucion(
     return { error: "Conecta un proyecto Supabase para procesar devoluciones (modo demo)." };
   }
 
-  const campanaId = String(formData.get("campana_id") ?? "");
-  if (!campanaId) return { error: "Campaña inválida." };
+  const parsed = parsearFormData(campanaIdSchema, formData);
+  if (!parsed.ok) return { error: parsed.error };
+  const campanaId = parsed.data.campana_id;
 
   const supabase = await createClient();
   const {
@@ -57,7 +60,11 @@ export async function solicitarDevolucion(
     return { error: "No encontramos una donación tuya pagada en esta campaña." };
   }
 
-  return {
-    message: "Solicitud registrada. Procesaremos tu reembolso a la brevedad.",
-  };
+  await registrarAuditoria("devolucion_solicitada", {
+    actorId: user.id,
+    campanaId,
+    detalle: { donaciones: data.length },
+  });
+
+  return { message: "Solicitud registrada. Procesaremos tu reembolso a la brevedad." };
 }

@@ -1,7 +1,10 @@
 import { NextRequest } from "next/server";
 import { getWebpayTransaction } from "@/lib/transbank/webpay";
-import { calcularComision, MONTO_MINIMO } from "@/lib/donaciones";
+import { calcularComision } from "@/lib/donaciones";
 import { guardarDonacionPendiente } from "@/lib/donaciones-store";
+import { donacionSchema, parsearFormData } from "@/lib/validaciones";
+import { mismoOrigen, ipDesdeHeaders } from "@/lib/seguridad";
+import { rateLimit, HORA } from "@/lib/rate-limit";
 
 // El SDK de Transbank usa Node (axios), no edge.
 export const runtime = "nodejs";
@@ -14,13 +17,25 @@ function nuevoBuyOrder(): string {
 }
 
 export async function POST(request: NextRequest) {
-  const form = await request.formData();
-  const campanaId = String(form.get("campana_id") ?? "");
-  const monto = parseInt(String(form.get("monto") ?? ""), 10);
-
-  if (!campanaId || !Number.isFinite(monto) || monto < MONTO_MINIMO) {
-    return new Response("Solicitud de donación inválida.", { status: 400 });
+  // Anti-CSRF: solo desde el mismo origen.
+  if (!mismoOrigen(request)) {
+    return new Response("Origen no permitido.", { status: 403 });
   }
+
+  // Rate limit: máx. 10 donaciones por IP cada hora.
+  const ip = ipDesdeHeaders(request.headers);
+  if (!rateLimit(`donar:${ip}`, 10, HORA).ok) {
+    return new Response("Demasiados intentos de donación. Intenta más tarde.", {
+      status: 429,
+    });
+  }
+
+  const form = await request.formData();
+  const parsed = parsearFormData(donacionSchema, form);
+  if (!parsed.ok) {
+    return new Response(parsed.error, { status: 400 });
+  }
+  const { campana_id: campanaId, monto } = parsed.data;
 
   const comision = calcularComision(monto);
   const buyOrder = nuevoBuyOrder();
@@ -31,8 +46,7 @@ export async function POST(request: NextRequest) {
     const tx = getWebpayTransaction();
     const resp = await tx.create(buyOrder, sessionId, monto, returnUrl);
 
-    // TODO(Supabase): reemplazar por insert en `donaciones` (estado 'pendiente',
-    // tbk_token = resp.token) usando service role.
+    // TODO(Supabase): insert en `donaciones` (estado 'pendiente', tbk_token).
     guardarDonacionPendiente({
       token: resp.token,
       buyOrder,
@@ -42,17 +56,17 @@ export async function POST(request: NextRequest) {
       creadaEn: Date.now(),
     });
 
-    // Webpay requiere un POST de `token_ws` a `resp.url`: devolvemos un form
-    // que se auto-envía. (resp.url y resp.token provienen de Transbank.)
+    // Webpay requiere POST de `token_ws` a `resp.url`: form que se auto-envía.
     const html = `<!doctype html>
 <html lang="es">
   <head><meta charset="utf-8" /><title>Redirigiendo a Webpay…</title></head>
-  <body onload="document.forms[0].submit()" style="font-family:system-ui;text-align:center;padding:3rem;color:#1C1917;background:#FFFBF5">
+  <body style="font-family:system-ui;text-align:center;padding:3rem;color:#1C1917;background:#FFFBF5">
     <form action="${resp.url}" method="POST">
       <input type="hidden" name="token_ws" value="${resp.token}" />
       <noscript><button type="submit">Continuar a Webpay</button></noscript>
     </form>
     <p>Redirigiendo a Webpay…</p>
+    <script>document.forms[0].submit();</script>
   </body>
 </html>`;
 

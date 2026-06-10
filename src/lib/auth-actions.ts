@@ -3,6 +3,14 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import {
+  loginSchema,
+  registroDonanteSchema,
+  registroVeterinariaSchema,
+  parsearFormData,
+} from "@/lib/validaciones";
+import { ipActual } from "@/lib/seguridad";
+import { rateLimit, MINUTO } from "@/lib/rate-limit";
 
 export interface AuthState {
   error?: string;
@@ -14,28 +22,25 @@ const NO_CONFIGURADO: AuthState = {
     "El login todavía no está activo: falta conectar un proyecto Supabase (.env.local).",
 };
 
-function validarCredenciales(email: string, password: string): string | null {
-  if (!email || !email.includes("@")) return "Ingresa un correo válido.";
-  if (password.length < 6)
-    return "La contraseña debe tener al menos 6 caracteres.";
-  return null;
-}
-
 export async function iniciarSesion(
   _prev: AuthState,
   formData: FormData
 ): Promise<AuthState> {
   if (!isSupabaseConfigured()) return NO_CONFIGURADO;
 
-  const email = String(formData.get("email") ?? "").trim();
-  const password = String(formData.get("password") ?? "");
+  // Rate limit: 5 intentos por IP cada 15 minutos.
+  const ip = await ipActual();
+  if (!rateLimit(`login:${ip}`, 5, 15 * MINUTO).ok) {
+    return { error: "Demasiados intentos. Espera unos minutos e intenta de nuevo." };
+  }
+
+  const parsed = parsearFormData(loginSchema, formData);
+  if (!parsed.ok) return { error: parsed.error };
 
   try {
     const supabase = await createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error } = await supabase.auth.signInWithPassword(parsed.data);
+    // Mensaje genérico: no revela si el correo existe (anti-enumeración).
     if (error) return { error: "Correo o contraseña incorrectos." };
   } catch {
     return { error: "No pudimos conectar con el servidor. Intenta de nuevo." };
@@ -50,12 +55,14 @@ export async function registrarDonante(
 ): Promise<AuthState> {
   if (!isSupabaseConfigured()) return NO_CONFIGURADO;
 
-  const nombre = String(formData.get("nombre") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim();
-  const password = String(formData.get("password") ?? "");
+  const ip = await ipActual();
+  if (!rateLimit(`registro:${ip}`, 5, 60 * MINUTO).ok) {
+    return { error: "Demasiados intentos. Espera un momento." };
+  }
 
-  const errMsg = validarCredenciales(email, password);
-  if (errMsg) return { error: errMsg };
+  const parsed = parsearFormData(registroDonanteSchema, formData);
+  if (!parsed.ok) return { error: parsed.error };
+  const { nombre, email, password } = parsed.data;
 
   try {
     const supabase = await createClient();
@@ -70,9 +77,7 @@ export async function registrarDonante(
     return { error: "No pudimos crear tu cuenta. Intenta de nuevo." };
   }
 
-  return {
-    message: "¡Listo! Te enviamos un correo para confirmar tu cuenta.",
-  };
+  return { message: "¡Listo! Te enviamos un correo para confirmar tu cuenta." };
 }
 
 export async function registrarVeterinaria(
@@ -81,17 +86,14 @@ export async function registrarVeterinaria(
 ): Promise<AuthState> {
   if (!isSupabaseConfigured()) return NO_CONFIGURADO;
 
-  const email = String(formData.get("email") ?? "").trim();
-  const password = String(formData.get("password") ?? "");
-  const nombre = String(formData.get("nombre") ?? "").trim();
-  const rut = String(formData.get("rut") ?? "").trim();
-  const direccion = String(formData.get("direccion") ?? "").trim();
-  const telefono = String(formData.get("telefono") ?? "").trim();
+  const ip = await ipActual();
+  if (!rateLimit(`registro:${ip}`, 5, 60 * MINUTO).ok) {
+    return { error: "Demasiados intentos. Espera un momento." };
+  }
 
-  const errMsg = validarCredenciales(email, password);
-  if (errMsg) return { error: errMsg };
-  if (!nombre || !rut)
-    return { error: "El nombre de la clínica y el RUT son obligatorios." };
+  const parsed = parsearFormData(registroVeterinariaSchema, formData);
+  if (!parsed.ok) return { error: parsed.error };
+  const { email, password, nombre, rut, direccion, telefono } = parsed.data;
 
   try {
     const supabase = await createClient();

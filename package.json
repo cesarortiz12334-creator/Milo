@@ -15,7 +15,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "resend": "^6.12.4",
-    "transbank-sdk": "^6.1.1"
+    "transbank-sdk": "^6.1.1",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

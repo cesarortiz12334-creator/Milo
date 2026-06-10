@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { evaluarCierre } from "@/lib/cierre";
 import { notificarCierre } from "@/lib/resend/emails";
+import { registrarAuditoria } from "@/lib/auditoria";
 
 export interface ResultadoCierre {
   procesadas: number;
@@ -52,6 +53,15 @@ export async function cerrarCampanasVencidas(): Promise<ResultadoCierre> {
         .eq("campana_id", c.id)
         .eq("estado", "pagada");
     }
+
+    await registrarAuditoria("campana_cerrada", {
+      campanaId: c.id,
+      detalle: {
+        estado: nuevoEstado,
+        recaudado: c.monto_recaudado,
+        meta: c.monto_meta,
+      },
+    });
 
     // Notifica el cierre (best-effort, no rompe el batch).
     try {
