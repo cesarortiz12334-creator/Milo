@@ -46,7 +46,10 @@ export async function POST(request: NextRequest) {
     const tx = getWebpayTransaction();
     const resp = await tx.create(buyOrder, sessionId, monto, returnUrl);
 
-    // TODO(Supabase): insert en `donaciones` (estado 'pendiente', tbk_token).
+    // TODO(Supabase): persistir la donación en la tabla `donaciones` en lugar del
+    // store en memoria. Insert: { campana_id, donante_id (si hay sesión), monto,
+    // comision, estado: 'pendiente', tbk_token: resp.token }. La columna tbk_token
+    // permite recuperarla en el retorno y da idempotencia (ponle índice único).
     guardarDonacionPendiente({
       token: resp.token,
       buyOrder,

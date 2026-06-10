@@ -20,6 +20,9 @@ export default async function CampanaDetalle({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  // TODO(Supabase): reemplazar los datos mock por la campaña real. Para campañas
+  // públicas (activa/exitosa) leer de la vista `campanas_publicas`; el donante
+  // dueño de un aporte puede ver también la suya 'no_financiada' (RLS migración 005).
   const { id } = await params;
   const campana = getCampanaMockById(id);
   if (!campana) notFound();
