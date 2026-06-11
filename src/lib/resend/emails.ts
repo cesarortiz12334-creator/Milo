@@ -5,6 +5,8 @@ import {
   tplCampanaActiva,
   tplCampanaExitosa,
   tplCampanaNoFinanciada,
+  tplFondosTransferidos,
+  tplActualizacionRecuperacion,
 } from "./templates";
 import type { CampanaEstado } from "@/types";
 
@@ -102,9 +104,32 @@ export async function notificarCampanaActiva(campanaId: string): Promise<void> {
   await enviarEmail({ to: email, subject, html });
 }
 
+/** Emails de los donantes con donación pagada de una campaña (sin repetir). */
+async function emailsDonantes(
+  supabase: ReturnType<typeof createAdminClient>,
+  campanaId: string
+): Promise<string[]> {
+  const { data } = await supabase
+    .from("donaciones")
+    .select("donante_id")
+    .eq("campana_id", campanaId)
+    .eq("estado", "pagada");
+  const filas = (data ?? []) as { donante_id: string | null }[];
+  const ids = [
+    ...new Set(filas.map((d) => d.donante_id).filter((x): x is string => !!x)),
+  ];
+  const emails: string[] = [];
+  for (const id of ids) {
+    const e = await emailDe(supabase, id);
+    if (e) emails.push(e);
+  }
+  return emails;
+}
+
 /**
- * Al cerrar: avisa a los donantes (y al solicitante si fue exitosa) según la
- * regla del 70%.
+ * Al cerrar (regla del 70%):
+ *  - exitosa → avisa al solicitante y a los donantes (fondos transferidos, F2).
+ *  - no_financiada → avisa a los donantes con sus opciones de devolución.
  */
 export async function notificarCierre(
   campanaId: string,
@@ -115,13 +140,14 @@ export async function notificarCierre(
 
   const { data: cData } = await supabase
     .from("campanas")
-    .select("titulo, monto_recaudado, mascota_id")
+    .select("titulo, monto_recaudado, mascota_id, veterinaria_id")
     .eq("id", campanaId)
     .single();
   const c = cData as {
     titulo: string;
     monto_recaudado: number;
     mascota_id: string;
+    veterinaria_id: string;
   } | null;
   if (!c) return;
 
@@ -134,37 +160,82 @@ export async function notificarCierre(
   if (!m) return;
 
   if (estado === "exitosa") {
-    const email = await emailDe(supabase, m.solicitante_id);
-    if (email) {
+    const emailSol = await emailDe(supabase, m.solicitante_id);
+    if (emailSol) {
       const { subject, html } = tplCampanaExitosa({
         mascotaNombre: m.nombre,
         titulo: c.titulo,
         montoRecaudado: c.monto_recaudado,
       });
-      await enviarEmail({ to: email, subject, html });
+      await enviarEmail({ to: emailSol, subject, html });
+    }
+
+    // F2: a los donantes, los fondos ya fueron transferidos a la veterinaria.
+    const { data: vData } = await supabase
+      .from("veterinarias")
+      .select("nombre")
+      .eq("user_id", c.veterinaria_id)
+      .single();
+    const vetNombre =
+      (vData as { nombre: string } | null)?.nombre ?? "la veterinaria";
+    const tpl = tplFondosTransferidos({
+      mascotaNombre: m.nombre,
+      veterinariaNombre: vetNombre,
+      montoRecaudado: c.monto_recaudado,
+      campanaId,
+    });
+    for (const email of await emailsDonantes(supabase, campanaId)) {
+      await enviarEmail({ to: email, subject: tpl.subject, html: tpl.html });
     }
     return;
   }
 
   // no_financiada: avisar a cada donante con sus opciones.
-  const { data: dData } = await supabase
-    .from("donaciones")
-    .select("donante_id")
-    .eq("campana_id", campanaId)
-    .eq("estado", "pagada");
-  const donaciones = (dData ?? []) as { donante_id: string | null }[];
-  const donanteIds = [
-    ...new Set(donaciones.map((d) => d.donante_id).filter((id): id is string => !!id)),
-  ];
-
-  const { subject, html } = tplCampanaNoFinanciada({
+  const tpl = tplCampanaNoFinanciada({
     mascotaNombre: m.nombre,
     titulo: c.titulo,
     campanaId,
   });
+  for (const email of await emailsDonantes(supabase, campanaId)) {
+    await enviarEmail({ to: email, subject: tpl.subject, html: tpl.html });
+  }
+}
 
-  for (const id of donanteIds) {
-    const email = await emailDe(supabase, id);
-    if (email) await enviarEmail({ to: email, subject, html });
+/**
+ * F3: el solicitante publicó una actualización (foto/mensaje de recuperación).
+ * Avisa a todos los donantes de la campaña.
+ */
+export async function notificarActualizacion(
+  campanaId: string,
+  mensaje: string,
+  fotoUrl: string | null
+): Promise<void> {
+  if (!activo()) return;
+  const supabase = createAdminClient();
+
+  const { data: cData } = await supabase
+    .from("campanas")
+    .select("mascota_id")
+    .eq("id", campanaId)
+    .single();
+  const c = cData as { mascota_id: string } | null;
+  if (!c) return;
+
+  const { data: mData } = await supabase
+    .from("mascotas")
+    .select("nombre")
+    .eq("id", c.mascota_id)
+    .single();
+  const m = mData as { nombre: string } | null;
+  if (!m) return;
+
+  const tpl = tplActualizacionRecuperacion({
+    mascotaNombre: m.nombre,
+    mensaje,
+    fotoUrl,
+    campanaId,
+  });
+  for (const email of await emailsDonantes(supabase, campanaId)) {
+    await enviarEmail({ to: email, subject: tpl.subject, html: tpl.html });
   }
 }

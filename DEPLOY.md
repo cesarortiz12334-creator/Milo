@@ -29,6 +29,7 @@ valida su RSH subiendo su Cartola Hogar en PDF (ver §4).
    005_cierre.sql           → cerrada_at, RLS donante, regla 70%
    006_seguridad.sql        → tabla auditoría inmutable + trigger monto inmutable
    007_cartola_rsh.sql      → cartola RSH del solicitante + revisión manual >$200k
+   008_reportes_y_transparencia.sql → tabla reportes + vista transferencias_publicas
    ```
    Opción B (CLI): `npx supabase link --project-ref <ref>` y luego
    `npx supabase db push`.
@@ -37,7 +38,7 @@ valida su RSH subiendo su Cartola Hogar en PDF (ver §4).
    con esa visibilidad.
 5. **Verifica RLS** (Authentication → Policies): todas las tablas (`users`,
    `solicitantes`, `veterinarias`, `mascotas`, `campanas`, `donaciones`,
-   `actualizaciones`, `auditoria`) deben tener "RLS enabled".
+   `actualizaciones`, `auditoria`, `reportes`) deben tener "RLS enabled".
 6. **Auth → Providers:** habilita **Email**. Para **Google** (donantes), ver §3.
 7. **Auth → URL Configuration:**
    - `Site URL` = tu dominio de producción (ej. `https://milo.cl`).
@@ -69,6 +70,11 @@ No se necesita ninguna variable de entorno de Google en la app: Supabase maneja 
    (ej. `Milo <hola@milo.cl>`).
 
 Sin Resend, la app funciona pero los emails solo se registran en consola.
+
+Emails transaccionales (en `src/lib/resend/templates.ts`), todos automáticos:
+nuevo caso pendiente (a la vet), campaña activa y **fondos transferidos** (a los
+donantes), campaña no financiada (opciones de devolución), recibo de donación, y
+**actualización de recuperación** con foto (a los donantes).
 
 ---
 
@@ -168,7 +174,7 @@ La capa demo funciona, pero estos puntos deben completarse para producción real
 
 ## 9. Checklist final antes de producción
 
-- [ ] Migraciones **001→007** aplicadas y verificadas en Supabase.
+- [ ] Migraciones **001→008** aplicadas y verificadas en Supabase.
 - [ ] Buckets `mascotas` (público) y `documentos` (privado) existen.
 - [ ] RLS activo en todas las tablas (incluida `auditoria`).
 - [ ] Email + Google habilitados en Supabase Auth; redirect URLs en la allowlist.

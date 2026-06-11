@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import CampanaCard from "@/components/CampanaCard";
 import { campanasMock } from "@/lib/mock/campanas";
 
@@ -59,18 +60,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-black/5 bg-white/50">
-        <div className="mx-auto max-w-6xl px-4 py-8 text-center text-sm text-muted">
-          <p>
-            Milo cobra una comisión del <strong className="text-dark">5%</strong> que
-            se muestra siempre antes de confirmar tu donación.
-          </p>
-          <p className="mt-2">
-            Pagos procesados de forma segura con Transbank Webpay Plus.
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

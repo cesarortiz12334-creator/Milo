@@ -10,10 +10,28 @@ export default async function SiteHeader() {
         <Link href="/" className="font-heading text-2xl font-extrabold text-primary">
           Milo
         </Link>
-        <nav className="flex items-center gap-2 sm:gap-3">
+        <nav className="flex items-center gap-1 sm:gap-2">
+          <Link
+            href="/como-funciona"
+            className="hidden rounded-full px-3 py-2 text-sm font-semibold text-dark transition hover:bg-primary-soft/40 lg:inline-block"
+          >
+            Cómo funciona
+          </Link>
+          <Link
+            href="/veterinarias"
+            className="hidden rounded-full px-3 py-2 text-sm font-semibold text-dark transition hover:bg-primary-soft/40 lg:inline-block"
+          >
+            Veterinarias
+          </Link>
+          <Link
+            href="/transparencia"
+            className="hidden rounded-full px-3 py-2 text-sm font-semibold text-dark transition hover:bg-primary-soft/40 lg:inline-block"
+          >
+            Transparencia
+          </Link>
           <Link
             href="/exitos"
-            className="hidden rounded-full px-4 py-2 text-sm font-semibold text-dark transition hover:bg-primary-soft/40 sm:inline-block"
+            className="hidden rounded-full px-3 py-2 text-sm font-semibold text-dark transition hover:bg-primary-soft/40 sm:inline-block"
           >
             Historias
           </Link>

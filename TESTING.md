@@ -137,3 +137,32 @@ curl -sI https://<dominio>/ | grep -iE "content-security|x-frame|x-content|refer
 ```
 **Esperado:** CSP presente, `X-Frame-Options: DENY`, `X-Content-Type-Options:
 nosniff`, HSTS presente, y **sin** `X-Powered-By`.
+
+---
+
+## 8. Confianza y notificaciones (páginas/funciones FAQ)
+
+**Reportar campaña (F1)**
+1. En el detalle de una campaña, clic en **"🚩 Reportar campaña"**.
+2. Elige una razón, escribe (opcional) y envía.
+- **Esperado:** mensaje "Gracias por reportar. Revisaremos este caso en menos de
+  24 horas." y, con Supabase conectado, una fila nueva en la tabla `reportes`
+  (razón, descripción, ip). Enviar > 5 reportes/hora desde una IP → bloqueado.
+
+**Email de fondos transferidos (F2)**
+1. Cierra una campaña como **exitosa** (fecha_limite pasada + cron, con donaciones
+   `pagada`).
+- **Esperado:** cada donante recibe el email *"Los fondos para [mascota] ya fueron
+  transferidos 💛"* (además del email al solicitante). Requiere Resend configurado.
+
+**Email de foto de recuperación (F3)**
+1. Como **solicitante dueño**, en la sección **"Actualizaciones"** del detalle,
+   publica un mensaje + foto.
+- **Esperado:** se inserta en `actualizaciones` y cada donante recibe el email
+  *"¡[mascota] está bien gracias a ti! 🐾"* con la foto. Un usuario que **no** es
+  el dueño → rechazado.
+
+**Páginas públicas (smoke):** `/como-funciona`, `/faq`, `/sobre-nosotros`,
+`/transparencia`, `/veterinarias`, `/terminos`, `/privacidad` → todas **200**. En
+`/transparencia` la tabla sale de la vista `transferencias_publicas`. En
+`/veterinarias`, el buscador filtra por nombre o comuna.

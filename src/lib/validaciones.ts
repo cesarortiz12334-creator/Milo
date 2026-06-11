@@ -81,6 +81,24 @@ export const campanaIdSchema = z.object({
   campana_id: z.string().trim().min(1).max(64),
 });
 
+export const RAZONES_REPORTE = [
+  "Creo que es falsa",
+  "El animal no existe",
+  "Documentos sospechosos",
+  "Otro",
+] as const;
+
+export const reporteSchema = z.object({
+  campana_id: z.string().trim().min(1).max(64),
+  razon: z.enum(RAZONES_REPORTE, { message: "Selecciona una razón." }),
+  descripcion: opcional(2000),
+});
+
+export const actualizacionSchema = z.object({
+  campana_id: z.string().trim().min(1).max(64),
+  mensaje: z.string().trim().min(1, "Escribe un mensaje.").max(2000),
+});
+
 export type ResultadoParseo<T> =
   | { ok: true; data: T }
   | { ok: false; error: string };

@@ -123,6 +123,49 @@ export function tplCampanaNoFinanciada(d: {
   };
 }
 
+export function tplFondosTransferidos(d: {
+  mascotaNombre: string;
+  veterinariaNombre: string;
+  montoRecaudado: number;
+  campanaId: string;
+}): EmailRenderizado {
+  return {
+    subject: `Los fondos para ${d.mascotaNombre} ya fueron transferidos 💛`,
+    html: layout({
+      titulo: "¡Tu aporte llegó a destino!",
+      cuerpo: `Gracias a ti y a la comunidad, la campaña de <strong>${esc(
+        d.mascotaNombre
+      )}</strong> se financió y los fondos ya fueron transferidos a <strong>${esc(
+        d.veterinariaNombre
+      )}</strong>.<br/><br/>Total recaudado: <strong>${formatearCLP(
+        d.montoRecaudado
+      )}</strong>. Pronto el dueño podría subir una foto de la recuperación.`,
+      cta: { texto: "Ver la campaña", url: `${SITE}/campana/${d.campanaId}` },
+    }),
+  };
+}
+
+export function tplActualizacionRecuperacion(d: {
+  mascotaNombre: string;
+  mensaje: string;
+  fotoUrl: string | null;
+  campanaId: string;
+}): EmailRenderizado {
+  const foto = d.fotoUrl
+    ? `<img src="${d.fotoUrl}" alt="Foto de ${esc(
+        d.mascotaNombre
+      )}" style="width:100%;max-width:480px;border-radius:12px;margin-top:8px" />`
+    : "";
+  return {
+    subject: `¡${d.mascotaNombre} está bien gracias a ti! 🐾`,
+    html: layout({
+      titulo: `Una actualización de ${esc(d.mascotaNombre)} 🐾`,
+      cuerpo: `${esc(d.mensaje)}<br/>${foto}`,
+      cta: { texto: "Ver la campaña", url: `${SITE}/campana/${d.campanaId}` },
+    }),
+  };
+}
+
 export function tplDonacionRecibida(d: {
   donanteNombre: string;
   mascotaNombre: string;

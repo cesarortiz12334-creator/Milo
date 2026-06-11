@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 import DonacionForm from "@/components/DonacionForm";
 import EstadoBadge from "@/components/EstadoBadge";
 import OpcionesDevolucion from "@/components/campanas/OpcionesDevolucion";
+import ReportarCampanaModal from "@/components/campanas/ReportarCampanaModal";
+import ActualizacionForm from "@/components/campanas/ActualizacionForm";
 import { getCampanaMockById } from "@/lib/mock/campanas";
 import { formatearCLP } from "@/lib/donaciones";
 import { emojiEspecie } from "@/lib/especie";
@@ -33,6 +36,7 @@ export default async function CampanaDetalle({
   );
   const financiada = progreso >= 70;
   const dias = diasRestantes(campana.fecha_limite);
+  const configurado = isSupabaseConfigured();
 
   return (
     <div className="min-h-screen">
@@ -88,6 +92,10 @@ export default async function CampanaDetalle({
                 {campana.descripcion}
               </p>
             )}
+
+            <div className="mt-6">
+              <ReportarCampanaModal campanaId={campana.id} />
+            </div>
           </div>
 
           {/* Columna lateral: progreso + donación */}
@@ -147,12 +155,28 @@ export default async function CampanaDetalle({
               <OpcionesDevolucion
                 campanaId={campana.id}
                 cerradaEn={campana.cerrada_at ?? null}
-                configurado={isSupabaseConfigured()}
+                configurado={configurado}
               />
             )}
           </aside>
         </div>
+
+        {/* Actualizaciones (foto/mensaje de recuperación → email a donantes) */}
+        <section className="mt-10 border-t border-black/5 pt-8">
+          <h2 className="font-heading text-xl font-bold text-dark">
+            Actualizaciones
+          </h2>
+          <p className="mt-1 text-sm text-muted">
+            El dueño de la campaña puede compartir cómo va su mascota; avisamos a
+            los donantes por email.
+          </p>
+          {/* TODO(Supabase): listar aquí las actualizaciones reales de la campaña. */}
+          <div className="mt-4 max-w-xl">
+            <ActualizacionForm campanaId={campana.id} configurado={configurado} />
+          </div>
+        </section>
       </main>
+      <SiteFooter />
     </div>
   );
 }
