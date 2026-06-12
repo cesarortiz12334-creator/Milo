@@ -1,4 +1,4 @@
-// Tipos globales de dominio para Milo.
+// Tipos globales de dominio para MiloFund.
 // Reflejan el esquema de supabase/migrations/001_initial.sql.
 
 export type UserRole = "solicitante" | "veterinaria" | "donante";

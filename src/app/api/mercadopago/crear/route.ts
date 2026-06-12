@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
         items: [
           {
             id: campanaId,
-            title: "Donación Milo",
+            title: "Donación MiloFund",
             quantity: 1,
             unit_price: monto,
             currency_id: "CLP",

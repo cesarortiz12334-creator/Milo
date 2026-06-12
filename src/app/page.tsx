@@ -17,7 +17,7 @@ export default function Home() {
           Cada mascota merece una <span className="text-primary">segunda oportunidad</span>
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base text-muted sm:text-lg">
-          Milo conecta a familias que necesitan ayuda con veterinarias verificadas
+          MiloFund conecta a familias que necesitan ayuda con veterinarias verificadas
           y donantes que quieren marcar la diferencia. Transparente, seguro y con el
           animal siempre como protagonista.
         </p>
@@ -49,7 +49,7 @@ export default function Home() {
           </p>
           <p className="mx-auto mt-1 max-w-lg text-sm text-muted">
             Conoce a las mascotas que ya se recuperaron gracias a la comunidad de
-            Milo.
+            MiloFund.
           </p>
           <Link
             href="/exitos"

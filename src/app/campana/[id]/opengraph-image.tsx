@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 import { getCampanaMockById } from "@/lib/mock/campanas";
 import { formatearCLP } from "@/lib/donaciones";
 
-export const alt = "Campaña en Milo";
+export const alt = "Campaña en MiloFund";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -42,7 +42,7 @@ export default async function CampanaOpenGraphImage({
         }}
       >
         <div style={{ display: "flex", fontSize: 40, fontWeight: 800, color: "#F97316" }}>
-          Milo
+          MiloFund
         </div>
         <div
           style={{

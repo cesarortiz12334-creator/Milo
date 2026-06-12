@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { registrarSolicitante, type AuthState } from "@/lib/auth-actions";
 import { Campo, Mensaje, BTN_PRIMARIO } from "./campos";
+import RegionComunaSelect from "./RegionComunaSelect";
 
 const inicial: AuthState = {};
 
@@ -15,7 +16,7 @@ export default function RegistroSolicitanteForm({
 
   return (
     <form action={action} className="space-y-3">
-      <Campo label="Nombre" name="nombre" autoComplete="name" required />
+      <Campo label="Nombre completo" name="nombre" autoComplete="name" required />
       <Campo label="RUT" name="rut" placeholder="12.345.678-9" required />
       <Campo
         label="Correo"
@@ -25,11 +26,27 @@ export default function RegistroSolicitanteForm({
         required
       />
       <Campo
+        label="Teléfono"
+        name="telefono"
+        type="tel"
+        autoComplete="tel"
+        placeholder="+56 9 1234 5678"
+        required
+      />
+      <Campo
+        label="Calle y número"
+        name="calle"
+        autoComplete="street-address"
+        placeholder="Av. Siempre Viva 742"
+        required
+      />
+      <RegionComunaSelect />
+      <Campo
         label="Contraseña"
         name="password"
         type="password"
         autoComplete="new-password"
-        minLength={6}
+        minLength={8}
         required
       />
       {state.error && <Mensaje tipo="error">{state.error}</Mensaje>}

@@ -59,7 +59,7 @@ export default function ReportarCampanaModal({
                   Reportar campaña
                 </h2>
                 <p className="text-sm text-muted">
-                  Ayúdanos a mantener Milo seguro. Tu reporte es anónimo.
+                  Ayúdanos a mantener MiloFund seguro. Tu reporte es anónimo.
                 </p>
                 <input type="hidden" name="campana_id" value={campanaId} />
                 <Select label="Razón" name="razon" defaultValue="" required>

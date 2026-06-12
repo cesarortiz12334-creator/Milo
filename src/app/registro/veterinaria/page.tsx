@@ -10,12 +10,12 @@ export default function RegistroVeterinariaPage() {
   return (
     <AuthShell
       titulo="Registrar veterinaria"
-      subtitulo="Suma tu clínica a la red de Milo."
+      subtitulo="Suma tu clínica a la red de MiloFund."
     >
       {!configurado && <AvisoSupabase />}
 
       <div className="rounded-xl border border-success/30 bg-success-soft/60 p-3 text-sm text-dark">
-        <strong>Verificación manual:</strong> tras registrarte, el equipo Milo
+        <strong>Verificación manual:</strong> tras registrarte, el equipo MiloFund
         revisa los datos de tu clínica antes de activarla. Recién entonces podrás
         confirmar casos y publicar campañas.
       </div>

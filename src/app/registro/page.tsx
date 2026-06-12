@@ -14,7 +14,7 @@ const roles = [
     externo: false,
     emoji: "🏥",
     titulo: "Soy veterinaria",
-    desc: "Clínica que atiende los casos. Requiere verificación del equipo Milo.",
+    desc: "Clínica que atiende los casos. Requiere verificación del equipo MiloFund.",
   },
   {
     href: "/registro/solicitante",
@@ -28,7 +28,7 @@ const roles = [
 export default function RegistroPage() {
   return (
     <AuthShell
-      titulo="Crear cuenta en Milo"
+      titulo="Crear cuenta en MiloFund"
       subtitulo="Elige cómo quieres participar."
     >
       <ul className="space-y-3">

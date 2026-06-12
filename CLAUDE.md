@@ -1,6 +1,6 @@
 # MILO — Contexto del Proyecto para Claude Code
 
-## Qué es Milo
+## Qué es MiloFund
 
 Plataforma web chilena de financiamiento colectivo para atención veterinaria.
 Conecta solicitantes vulnerables (RSH tramo 40% o inferior, validado con la
@@ -8,10 +8,13 @@ Cartola Hogar del RSH en PDF) con veterinarias verificadas y donantes.
 
 ## Tres roles de usuario
 
-- **solicitante**: dueño de mascota vulnerable. Se registra con email/contraseña y
-  su RUT; su RSH se valida con la Cartola Hogar (PDF) al crear la campaña.
-- **veterinaria**: clínica registrada. Requiere verificación manual del equipo Milo.
-- **donante**: cualquier persona. Registro simple con email/Google.
+- **solicitante**: dueño de mascota vulnerable. Se registra con nombre, RUT, email,
+  teléfono, dirección (calle/comuna/región) y contraseña; el RUT se guarda hasheado
+  y se cruza con el de la Cartola Hogar (PDF) al crear la campaña, que valida su RSH.
+- **veterinaria**: clínica registrada (razón social, RUT empresa, dirección,
+  comuna, región, teléfono). Requiere verificación manual del equipo MiloFund.
+- **donante**: cualquier persona. Registro con nombre, RUT (hasheado), email,
+  teléfono y contraseña (o Google).
 
 ## Stack
 
@@ -65,7 +68,7 @@ Cuando una campaña cierra (fecha_limite alcanzada):
 
 - `monto_recaudado >= 70%` de `monto_meta` → estado = `'exitosa'`, transferir fondos a la vet.
 - `monto_recaudado < 70%` de `monto_meta` → estado = `'no_financiada'` → notificar
-  donantes con opciones: (A) redirigir a otra campaña, (B) crédito Milo → devolución
+  donantes con opciones: (A) redirigir a otra campaña, (B) crédito MiloFund → devolución
   en efectivo disponible solo si se solicita dentro de 72 horas.
 
 ## Validaciones anti-fraude (nunca saltarse)

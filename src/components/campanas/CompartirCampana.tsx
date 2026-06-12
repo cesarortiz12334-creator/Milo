@@ -13,7 +13,7 @@ export default function CompartirCampana({
 }) {
   const [copiado, setCopiado] = useState(false);
 
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://milofund.com";
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://milofund.cl";
   const url = `${base}/campana/${campanaId}`;
   const texto = `Ayuda a ${mascota}: ${titulo} 🐾`;
 

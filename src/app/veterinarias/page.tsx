@@ -52,14 +52,14 @@ export default async function VeterinariasPage() {
               Veterinarias verificadas
             </h1>
             <p className="mt-2 text-muted">
-              Clínicas que pasaron la verificación del equipo Milo.
+              Clínicas que pasaron la verificación del equipo MiloFund.
             </p>
           </div>
           <Link
             href="/registro/veterinaria"
             className="rounded-full bg-primary px-5 py-2.5 font-heading text-sm font-bold text-white transition hover:bg-primary/90"
           >
-            Registra tu clínica en Milo
+            Registra tu clínica en MiloFund
           </Link>
         </div>
 

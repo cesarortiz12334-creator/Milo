@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { rutValido } from "@/lib/rut";
+import { NOMBRES_REGIONES, comunaEnRegion, telefonoChilenoValido } from "@/lib/chile";
 
 /**
  * Esquemas de validación server-side (Zod). NUNCA confiar solo en el frontend:
@@ -13,9 +15,33 @@ export const MONTO_MIN_META = 1000;
 const email = z.string().trim().toLowerCase().email("Ingresa un correo válido.").max(255);
 const passwordNuevo = z
   .string()
-  .min(6, "La contraseña debe tener al menos 6 caracteres.")
+  .min(8, "La contraseña debe tener al menos 8 caracteres.")
   .max(200);
 const opcional = (max: number) => z.string().trim().max(max).optional().or(z.literal(""));
+
+// RUT chileno: formato + dígito verificador (módulo 11). Reutilizable.
+const rut = z
+  .string()
+  .trim()
+  .regex(
+    /^\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]$/,
+    "Ingresa un RUT válido (ej: 12.345.678-9)."
+  )
+  .refine(rutValido, "El RUT no es válido (revisa el dígito verificador).");
+
+// Teléfono móvil chileno (+56 9 XXXX XXXX, con o sin separadores).
+const telefono = z
+  .string()
+  .trim()
+  .refine(telefonoChilenoValido, "Ingresa un teléfono chileno válido (ej: +56 9 1234 5678).");
+
+const region = z
+  .string()
+  .trim()
+  .min(1, "Selecciona tu región.")
+  .refine((r) => NOMBRES_REGIONES.includes(r), "Selecciona una región válida.");
+
+const comuna = z.string().trim().min(1, "Selecciona tu comuna.").max(80);
 
 export const loginSchema = z.object({
   email,
@@ -23,32 +49,65 @@ export const loginSchema = z.object({
 });
 
 export const registroDonanteSchema = z.object({
-  nombre: z.string().trim().min(1, "Ingresa tu nombre.").max(120),
+  nombre: z.string().trim().min(1, "Ingresa tu nombre completo.").max(120),
+  rut,
   email,
+  telefono,
   password: passwordNuevo,
 });
 
-export const registroSolicitanteSchema = z.object({
+export const registroSolicitanteSchema = z
+  .object({
+    nombre: z.string().trim().min(1, "Ingresa tu nombre completo.").max(120),
+    rut,
+    email,
+    telefono,
+    calle: z.string().trim().min(3, "Ingresa tu calle y número.").max(200),
+    region,
+    comuna,
+    password: passwordNuevo,
+  })
+  .refine((d) => comunaEnRegion(d.comuna, d.region), {
+    path: ["comuna"],
+    message: "La comuna no corresponde a la región seleccionada.",
+  });
+
+export const registroVeterinariaSchema = z
+  .object({
+    nombre: z.string().trim().min(1, "La razón social es obligatoria.").max(160),
+    rut,
+    email,
+    telefono,
+    calle: z.string().trim().min(3, "Ingresa la dirección.").max(200),
+    region,
+    comuna,
+    password: passwordNuevo,
+  })
+  .refine((d) => comunaEnRegion(d.comuna, d.region), {
+    path: ["comuna"],
+    message: "La comuna no corresponde a la región seleccionada.",
+  });
+
+// Recuperación de contraseña.
+export const emailSoloSchema = z.object({ email });
+export const nuevaPasswordSchema = z.object({ password: passwordNuevo });
+
+// Edición de perfil (los campos de dirección solo aplican a solicitante/vet).
+export const perfilSchema = z.object({
   nombre: z.string().trim().min(1, "Ingresa tu nombre.").max(120),
-  email,
-  password: passwordNuevo,
-  rut: z
+  telefono,
+  calle: opcional(200),
+  comuna: opcional(80),
+  region: opcional(60),
+});
+
+// Campo guiado de la descripción: obligatorio, mínimo 50 caracteres.
+const guiado = (etiqueta: string) =>
+  z
     .string()
     .trim()
-    .regex(
-      /^\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]$/,
-      "Ingresa un RUT válido (ej: 12.345.678-9)."
-    ),
-});
-
-export const registroVeterinariaSchema = z.object({
-  email,
-  password: passwordNuevo,
-  nombre: z.string().trim().min(1, "El nombre de la clínica es obligatorio.").max(160),
-  rut: z.string().trim().min(3, "Ingresa el RUT.").max(20),
-  direccion: opcional(200),
-  telefono: opcional(30),
-});
+    .min(50, `${etiqueta}: cuéntanos un poco más (mínimo 50 caracteres).`)
+    .max(2000);
 
 export const crearCampanaSchema = z.object({
   nombre: z.string().trim().min(1, "Ingresa el nombre de la mascota.").max(80),
@@ -56,9 +115,12 @@ export const crearCampanaSchema = z.object({
     message: "Selecciona una especie válida.",
   }),
   raza: opcional(80),
-  descripcion_mascota: opcional(2000),
   titulo: z.string().trim().min(3, "El título es muy corto.").max(120),
-  descripcion_campana: opcional(5000),
+  // Descripción enriquecida: 4 campos guiados que se combinan en una sola.
+  que_paso: guiado("Qué le pasó"),
+  diagnostico: guiado("Diagnóstico"),
+  por_que_ayuda: guiado("Por qué necesitan ayuda"),
+  algo_especial: guiado("Algo especial"),
   monto_meta: z.coerce
     .number()
     .int("El monto debe ser un número entero.")

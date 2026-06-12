@@ -22,7 +22,7 @@ export interface CampanaState {
   message?: string;
 }
 
-// Campañas por sobre este monto requieren revisión manual del equipo Milo.
+// Campañas por sobre este monto requieren revisión manual del equipo MiloFund.
 const MONTO_REVISION_MANUAL = 200_000;
 
 export async function crearCampana(
@@ -119,25 +119,45 @@ export async function crearCampana(
     })
     .eq("user_id", user.id);
 
-  // --- Foto de la mascota (opcional). Tipo, tamaño y CONTENIDO real. ---
-  let fotoUrl: string | null = null;
-  const foto = formData.get("foto");
-  if (foto instanceof File && foto.size > 0) {
-    const errFotoTipo = validarArchivo(foto, { tipos: TIPOS_IMAGEN, maxMB: MAX_MB });
+  // --- Fotos de la mascota (1 a 5, OBLIGATORIAS). Tipo, tamaño y contenido real. ---
+  const fotos = formData
+    .getAll("fotos")
+    .filter((f): f is File => f instanceof File && f.size > 0);
+  if (fotos.length === 0) {
+    return {
+      error: "Debes subir al menos una foto de tu mascota para crear la campaña.",
+    };
+  }
+  if (fotos.length > 5) {
+    return { error: "Puedes subir un máximo de 5 fotos." };
+  }
+  const fotosUrls: string[] = [];
+  for (const f of fotos) {
+    const errFotoTipo = validarArchivo(f, { tipos: TIPOS_IMAGEN, maxMB: MAX_MB });
     if (errFotoTipo) return { error: errFotoTipo };
-    const errFotoContenido = await verificarContenidoArchivo(foto, TIPOS_IMAGEN);
+    const errFotoContenido = await verificarContenidoArchivo(f, TIPOS_IMAGEN);
     if (errFotoContenido) return { error: errFotoContenido };
 
-    const ruta = `${user.id}/${crypto.randomUUID()}-${foto.name}`;
+    const ruta = `${user.id}/${crypto.randomUUID()}-${f.name}`;
     const { error: upErr } = await supabase.storage
       .from("mascotas")
-      .upload(ruta, foto, { contentType: foto.type });
-    if (upErr) return { error: "No pudimos subir la foto. Intenta de nuevo." };
-    const { data: pub } = supabase.storage.from("mascotas").getPublicUrl(ruta);
-    fotoUrl = pub.publicUrl;
+      .upload(ruta, f, { contentType: f.type });
+    if (upErr) return { error: "No pudimos subir las fotos. Intenta de nuevo." };
+    fotosUrls.push(
+      supabase.storage.from("mascotas").getPublicUrl(ruta).data.publicUrl
+    );
   }
+  const fotoUrl = fotosUrls[0];
 
-  // Campañas > $200.000 → revisión manual del equipo Milo antes de publicarse.
+  // Descripción enriquecida: combinamos los 4 campos guiados en una sola.
+  const descripcionCompleta = [
+    `¿Qué le pasó?\n${d.que_paso}`,
+    `Diagnóstico de la veterinaria:\n${d.diagnostico}`,
+    `¿Por qué necesitan ayuda?\n${d.por_que_ayuda}`,
+    `Sobre ${d.nombre}:\n${d.algo_especial}`,
+  ].join("\n\n");
+
+  // Campañas > $200.000 → revisión manual del equipo MiloFund antes de publicarse.
   const requiereRevision = d.monto_meta > MONTO_REVISION_MANUAL;
 
   // Inserta mascota.
@@ -149,7 +169,8 @@ export async function crearCampana(
       especie: d.especie,
       raza: d.raza || null,
       foto_url: fotoUrl,
-      descripcion: d.descripcion_mascota || null,
+      fotos_urls: fotosUrls,
+      descripcion: d.algo_especial,
     })
     .select("id")
     .single();
@@ -159,14 +180,14 @@ export async function crearCampana(
   }
 
   // Inserta campaña en 'pendiente' (la vet debe confirmar; y si supera el monto,
-  // además requiere revisión manual de Milo).
+  // además requiere revisión manual de MiloFund).
   const { data: campData, error: cErr } = await supabase
     .from("campanas")
     .insert({
       mascota_id: mascota.id,
       veterinaria_id: d.veterinaria_id,
       titulo: d.titulo,
-      descripcion: d.descripcion_campana || null,
+      descripcion: descripcionCompleta,
       monto_meta: d.monto_meta,
       estado: "pendiente",
       fecha_limite: d.fecha_limite || null,

@@ -110,7 +110,7 @@ export default async function VeterinariaPanel() {
             </Mensaje>
           ) : !verificada ? (
             <Mensaje tipo="error">
-              Tu veterinaria está pendiente de verificación por el equipo Milo.
+              Tu veterinaria está pendiente de verificación por el equipo MiloFund.
               Cuando la aprobemos podrás confirmar casos y activar campañas.
             </Mensaje>
           ) : (

@@ -26,7 +26,7 @@ const FLUJOS = [
   {
     rol: "Para veterinarias",
     pasos: [
-      { i: "✅", t: "Regístrate y pasa la verificación", d: "El equipo Milo valida tu clínica." },
+      { i: "✅", t: "Regístrate y pasa la verificación", d: "El equipo MiloFund valida tu clínica." },
       { i: "📋", t: "Confirma casos de tus pacientes", d: "Sube el presupuesto oficial y aprueba." },
       { i: "🏦", t: "Recibe los fondos directamente", d: "En tu cuenta, al cerrar la campaña." },
     ],
@@ -40,7 +40,7 @@ export default function ComoFuncionaPage() {
       <SiteHeader />
       <main className="mx-auto max-w-5xl px-4 py-12">
         <h1 className="text-center font-heading text-3xl font-extrabold text-dark sm:text-4xl">
-          Cómo funciona Milo
+          Cómo funciona MiloFund
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-center text-muted">
           Tres formas de ser parte. Elige la tuya.

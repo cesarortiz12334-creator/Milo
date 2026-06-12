@@ -44,11 +44,11 @@ export async function confirmarCaso(
   const vet = vetData as { verificada: boolean } | null;
   if (!vet) return { error: "Solo las veterinarias pueden confirmar casos." };
   if (!vet.verificada) {
-    return { error: "Tu veterinaria aún no está verificada por el equipo Milo." };
+    return { error: "Tu veterinaria aún no está verificada por el equipo MiloFund." };
   }
 
   // Trae el caso (asignado a esta vet y pendiente) para decidir si requiere
-  // revisión manual del equipo Milo antes de publicarse.
+  // revisión manual del equipo MiloFund antes de publicarse.
   const { data: campData } = await supabase
     .from("campanas")
     .select("requiere_revision_manual, revision_manual_aprobada")
@@ -114,7 +114,7 @@ export async function confirmarCaso(
   revalidatePath("/veterinaria");
   return {
     message: bloqueadaPorRevision
-      ? "Caso confirmado. Como la campaña supera $200.000, queda en revisión del equipo Milo antes de publicarse."
+      ? "Caso confirmado. Como la campaña supera $200.000, queda en revisión del equipo MiloFund antes de publicarse."
       : "Caso confirmado: la campaña ya está activa. 🎉",
   };
 }

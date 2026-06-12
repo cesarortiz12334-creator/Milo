@@ -1,6 +1,6 @@
-# Guía de Deploy — Milo
+# Guía de Deploy — MiloFund
 
-Paso a paso, **en orden**, para llevar Milo de "modo demo" a producción real. Al
+Paso a paso, **en orden**, para llevar MiloFund de "modo demo" a producción real. Al
 terminar, marca el [checklist final](#9-checklist-final-antes-de-producción).
 
 Tiempo estimado: unas horas. **Ya no hay trámites con el Estado**: el solicitante
@@ -31,9 +31,17 @@ valida su RSH subiendo su Cartola Hogar en PDF (ver §4).
    007_cartola_rsh.sql      → cartola RSH del solicitante + revisión manual >$200k
    008_reportes_y_transparencia.sql → tabla reportes + vista transferencias_publicas
    009_mensajes_contacto.sql → tabla mensajes_contacto (formulario de contacto)
+   010_perfiles_completos.sql → registro ampliado: users.nombre/telefono/rut_hash,
+                                solicitantes.calle/comuna/region, veterinarias.comuna/region,
+                                mascotas.fotos_urls + trigger handle_new_user actualizado
    ```
    Opción B (CLI): `npx supabase link --project-ref <ref>` y luego
    `npx supabase db push`.
+
+   > ⚠️ **Si la base ya estaba creada con 001→009**, basta correr **010** (es
+   > idempotente: `ADD COLUMN IF NOT EXISTS` + `CREATE OR REPLACE`). Sin la 010,
+   > el registro nuevo (donante con RUT/teléfono, solicitante con dirección) falla
+   > porque el trigger inserta en columnas que aún no existen.
 4. **Verifica Storage** (Storage → Buckets): deben existir `mascotas` (público) y
    `documentos` (privado). Los crea la migración 003; si no aparecen, créalos a mano
    con esa visibilidad.
@@ -43,7 +51,7 @@ valida su RSH subiendo su Cartola Hogar en PDF (ver §4).
    "RLS enabled".
 6. **Auth → Providers:** habilita **Email**. Para **Google** (donantes), ver §3.
 7. **Auth → URL Configuration:**
-   - `Site URL` = tu dominio de producción (ej. `https://milo.cl`).
+   - `Site URL` = tu dominio de producción (ej. `https://milofund.cl`).
    - `Redirect URLs` (allowlist): agrega `https://<tu-dominio>/auth/callback` y, para
      dev, `http://localhost:3000/auth/callback`.
 
@@ -69,7 +77,7 @@ No se necesita ninguna variable de entorno de Google en la app: Supabase maneja 
    que te indica. Espera a que quede **Verified**.
 3. **API Keys → Create API Key** → `RESEND_API_KEY`.
 4. Define `MILO_FROM_EMAIL` con una dirección **de ese dominio verificado**
-   (ej. `Milo <hola@milo.cl>`).
+   (ej. `MiloFund <hola@milofund.cl>`).
 
 Sin Resend, la app funciona pero los emails solo se registran en consola.
 
@@ -92,7 +100,7 @@ sube su **Cartola Hogar del RSH** en PDF, y el servidor la valida automáticamen
 4. El **tramo debe ser ≤ 40%**.
 
 > El solicitante descarga su cartola **gratis** en **https://ventanillaunicasocial.gob.cl**
-> con **su propia** Clave Única (no la de Milo). Milo no integra Clave Única.
+> con **su propia** Clave Única (no la de MiloFund). MiloFund no integra Clave Única.
 
 > ⚠️ **CALIBRACIÓN OBLIGATORIA:** los patrones de extracción de RUT, fecha y tramo
 > en `src/lib/cartola.ts` son SUPUESTOS (no hubo cartola de muestra al construir).
@@ -179,7 +187,7 @@ La capa demo funciona, pero estos puntos deben completarse para producción real
   tramo) y la firma del PDF (Producer) con cartolas RSH reales; idealmente añadir
   verificación del código/QR contra el sistema del Estado.
 - Revisión manual de campañas > $200.000: falta la acción de back-office del equipo
-  Milo que apruebe (`campanas.revision_manual_aprobada = true`) y active la campaña
+  MiloFund que apruebe (`campanas.revision_manual_aprobada = true`) y active la campaña
   una vez confirmada por la vet.
 - `src/app/campana/[id]/page.tsx` → leer la campaña real desde la vista
   `campanas_publicas` (hoy usa datos mock).
@@ -188,7 +196,7 @@ La capa demo funciona, pero estos puntos deben completarse para producción real
 
 ## 9. Checklist final antes de producción
 
-- [ ] Migraciones **001→009** aplicadas y verificadas en Supabase.
+- [ ] Migraciones **001→010** aplicadas y verificadas en Supabase.
 - [ ] Buckets `mascotas` (público) y `documentos` (privado) existen.
 - [ ] RLS activo en todas las tablas (incluida `auditoria`).
 - [ ] Email + Google habilitados en Supabase Auth; redirect URLs en la allowlist.
@@ -198,7 +206,7 @@ La capa demo funciona, pero estos puntos deben completarse para producción real
 - [ ] `MERCADOPAGO_ACCESS_TOKEN` cargado (sandbox primero, luego productivo).
 - [ ] `CRON_SECRET` cargada; cron visible en Vercel → Settings → Cron Jobs.
 - [ ] **`NEXT_PUBLIC_SITE_URL` reemplazado por el dominio real** (afecta Open
-      Graph, sitemap y botones de compartir; hoy es placeholder `milofund.com`).
+      Graph, sitemap y botones de compartir; hoy es placeholder `milofund.cl`).
 - [ ] (Recomendado) Upstash configurado y `rate-limit.ts` adaptado.
 - [ ] Los `TODO(Supabase)` del §8 implementados.
 - [ ] **Contenidos legales** (/terminos, /privacidad, /cookies) redactados por un

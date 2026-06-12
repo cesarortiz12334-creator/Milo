@@ -74,7 +74,7 @@ export default async function ExitosPage() {
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-base text-muted sm:text-lg">
           Cada una de estas mascotas recibió la atención que necesitaba gracias a
-          la comunidad de Milo. Esto es lo que tu aporte hace posible.
+          la comunidad de MiloFund. Esto es lo que tu aporte hace posible.
         </p>
       </section>
 

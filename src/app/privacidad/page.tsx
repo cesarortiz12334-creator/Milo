@@ -7,9 +7,9 @@ const SECCIONES = [
   { t: "2. Para qué los usamos", d: "Para verificar elegibilidad, operar las campañas, procesar donaciones y enviar notificaciones. [Por completar.]" },
   { t: "3. Datos sensibles", d: "El RUT se guarda hasheado y el tramo RSH nunca se expone públicamente. Los documentos viven en almacenamiento privado. [Por completar.]" },
   { t: "4. Con quién los compartimos", d: "Con la veterinaria del caso (datos mínimos) y proveedores de pago/email. No vendemos datos. [Por completar.]" },
-  { t: "5. Tus derechos", d: "Puedes solicitar acceso, rectificación o eliminación de tus datos escribiendo a hola@milo.cl. [Por completar según la Ley 19.628 / normativa vigente.]" },
+  { t: "5. Tus derechos", d: "Puedes solicitar acceso, rectificación o eliminación de tus datos escribiendo a hola@milofund.cl. [Por completar según la Ley 19.628 / normativa vigente.]" },
   { t: "6. Cookies", d: "Usamos cookies necesarias para la sesión. [Por completar.]" },
-  { t: "7. Contacto", d: "Dudas de privacidad a hola@milo.cl. [Por completar.]" },
+  { t: "7. Contacto", d: "Dudas de privacidad a hola@milofund.cl. [Por completar.]" },
 ];
 
 export default function PrivacidadPage() {

@@ -45,7 +45,7 @@ export async function cerrarCampanasVencidas(): Promise<ResultadoCierre> {
       // TODO(back-office): transferir los fondos recaudados a la veterinaria.
     } else {
       noFinanciadas++;
-      // Las donaciones pagadas pasan a crédito Milo por defecto; el donante
+      // Las donaciones pagadas pasan a crédito MiloFund por defecto; el donante
       // puede pedir devolución en efectivo dentro de 72h (OpcionesDevolucion).
       await supabase
         .from("donaciones")

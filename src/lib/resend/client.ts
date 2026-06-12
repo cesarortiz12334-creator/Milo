@@ -6,7 +6,7 @@ export function isResendConfigured(): boolean {
   return Boolean(key && !key.includes("tu-resend-api-key"));
 }
 
-const FROM = process.env.MILO_FROM_EMAIL ?? "Milo <hola@milo.cl>";
+const FROM = process.env.MILO_FROM_EMAIL ?? "MiloFund <hola@milofund.cl>";
 
 /**
  * Envía un email transaccional. En modo demo (sin RESEND_API_KEY) no envía:

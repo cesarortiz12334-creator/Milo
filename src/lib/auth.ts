@@ -6,6 +6,7 @@ export interface SesionActual {
   userId: string;
   email: string | null;
   role: UserRole | null;
+  nombre: string | null;
 }
 
 /**
@@ -23,15 +24,16 @@ export async function getUsuarioActual(): Promise<SesionActual | null> {
 
     const { data } = await supabase
       .from("users")
-      .select("role")
+      .select("role, nombre")
       .eq("id", user.id)
       .single();
-    const perfil = data as { role: UserRole } | null;
+    const perfil = data as { role: UserRole; nombre: string | null } | null;
 
     return {
       userId: user.id,
       email: user.email ?? null,
       role: perfil?.role ?? null,
+      nombre: perfil?.nombre ?? null,
     };
   } catch {
     return null;

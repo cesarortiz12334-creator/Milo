@@ -16,7 +16,7 @@ const inter = Inter({
 });
 
 // Placeholder: el programador reemplaza NEXT_PUBLIC_SITE_URL por el dominio real.
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://milofund.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://milofund.cl";
 
 const DESCRIPCION =
   "Plataforma chilena de financiamiento colectivo para atención veterinaria. Conectamos personas vulnerables con veterinarias y donantes.";
@@ -24,24 +24,24 @@ const DESCRIPCION =
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Milo — Ayuda a una mascota a recuperarse",
-    template: "%s · Milo",
+    default: "MiloFund — Ayuda a una mascota a recuperarse",
+    template: "%s · MiloFund",
   },
   description: DESCRIPCION,
-  applicationName: "Milo",
+  applicationName: "MiloFund",
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },
   openGraph: {
     type: "website",
     locale: "es_CL",
-    siteName: "Milo",
+    siteName: "MiloFund",
     url: "/",
-    title: "Milo — Ayuda a una mascota a recuperarse",
+    title: "MiloFund — Ayuda a una mascota a recuperarse",
     description: DESCRIPCION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Milo — Ayuda a una mascota a recuperarse",
+    title: "MiloFund — Ayuda a una mascota a recuperarse",
     description: DESCRIPCION,
   },
 };

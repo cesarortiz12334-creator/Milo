@@ -15,7 +15,8 @@ export default function RegistroDonanteForm({
 
   return (
     <form action={action} className="space-y-3">
-      <Campo label="Nombre" name="nombre" autoComplete="name" required />
+      <Campo label="Nombre completo" name="nombre" autoComplete="name" required />
+      <Campo label="RUT" name="rut" placeholder="12.345.678-9" required />
       <Campo
         label="Correo"
         name="email"
@@ -24,11 +25,19 @@ export default function RegistroDonanteForm({
         required
       />
       <Campo
+        label="Teléfono"
+        name="telefono"
+        type="tel"
+        autoComplete="tel"
+        placeholder="+56 9 1234 5678"
+        required
+      />
+      <Campo
         label="Contraseña"
         name="password"
         type="password"
         autoComplete="new-password"
-        minLength={6}
+        minLength={8}
         required
       />
       {state.error && <Mensaje tipo="error">{state.error}</Mensaje>}

@@ -25,7 +25,7 @@ function layout({
 <html lang="es">
   <body style="margin:0;background:#FFFBF5;font-family:Arial,Helvetica,sans-serif;color:#1C1917;">
     <div style="max-width:560px;margin:0 auto;padding:24px;">
-      <div style="font-size:24px;font-weight:800;color:#F97316;">Milo</div>
+      <div style="font-size:24px;font-weight:800;color:#F97316;">MiloFund</div>
       <div style="background:#ffffff;border-radius:16px;padding:24px;margin-top:16px;border:1px solid rgba(0,0,0,0.05);">
         <h1 style="font-size:20px;margin:0 0 12px;color:#1C1917;">${titulo}</h1>
         <div style="font-size:15px;line-height:1.6;color:#1C1917;">${cuerpo}</div>
@@ -38,7 +38,7 @@ function layout({
         }
       </div>
       <p style="font-size:12px;color:#78716C;margin-top:16px;text-align:center;">
-        Milo · Financiamiento colectivo veterinario
+        MiloFund · Financiamiento colectivo veterinario
       </p>
     </div>
   </body>
@@ -117,7 +117,7 @@ export function tplCampanaNoFinanciada(d: {
       titulo: "La campaña no alcanzó su meta",
       cuerpo: `La campaña <strong>${esc(
         d.titulo
-      )}</strong> no llegó al 70% de la meta dentro del plazo. Tu aporte está protegido: puedes <strong>redirigirlo a otra campaña</strong>, dejarlo como <strong>crédito Milo</strong>, o pedir la <strong>devolución en efectivo</strong> dentro de las próximas 72 horas.`,
+      )}</strong> no llegó al 70% de la meta dentro del plazo. Tu aporte está protegido: puedes <strong>redirigirlo a otra campaña</strong>, dejarlo como <strong>crédito MiloFund</strong>, o pedir la <strong>devolución en efectivo</strong> dentro de las próximas 72 horas.`,
       cta: { texto: "Ver mis opciones", url: `${SITE}/campana/${d.campanaId}` },
     }),
   };
@@ -182,7 +182,7 @@ export function tplDonacionRecibida(d: {
         d.mascotaNombre
       )}</strong>:<br/><br/>
       Tu donación: <strong>${formatearCLP(d.monto)}</strong><br/>
-      Comisión Milo (6% IVA incl.): ${formatearCLP(d.comision)}<br/>
+      Comisión MiloFund (6% IVA incl.): ${formatearCLP(d.comision)}<br/>
       La campaña recibe: <strong>${formatearCLP(d.neto)}</strong><br/><br/>
       Te enviaremos el certificado cuando la campaña cierre.`,
       cta: { texto: "Ver la campaña", url: `${SITE}/campana/${d.campanaId}` },

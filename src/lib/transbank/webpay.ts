@@ -12,7 +12,7 @@ import {
  *   Tarjetas de prueba: https://www.transbankdevelopers.cl/documentacion/como_empezar#tarjetas-de-prueba
  * - Entorno `production`: usa TBK_COMMERCE_CODE / TBK_API_KEY (solo servidor).
  *
- * Milo NUNCA maneja datos de tarjeta: el pago ocurre 100% en Webpay.
+ * MiloFund NUNCA maneja datos de tarjeta: el pago ocurre 100% en Webpay.
  * Este helper solo debe importarse desde código de servidor (route handlers).
  */
 export function getWebpayTransaction() {

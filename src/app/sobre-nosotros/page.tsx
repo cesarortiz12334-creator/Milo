@@ -44,8 +44,8 @@ export default function SobreNosotrosPage() {
             parvovirus. En la clínica, su dueño vio a otra familia que no podía
             pagar la atención de su mascota y tuvo que irse sin ella. Esa
             experiencia —la impotencia de no poder ayudar— inspiró la creación de
-            <strong> Milo, la plataforma</strong>: para que ninguna familia tenga
-            que vivir lo mismo.
+            <strong> MiloFund, la plataforma</strong>: para que ninguna familia
+            tenga que vivir lo mismo.
           </p>
         </section>
 
@@ -95,7 +95,7 @@ export default function SobreNosotrosPage() {
 
         {/* CTA */}
         <section className="mt-12 rounded-2xl bg-success-soft/50 p-8 text-center">
-          <h2 className="font-heading text-xl font-bold text-dark">Únete a Milo</h2>
+          <h2 className="font-heading text-xl font-bold text-dark">Únete a MiloFund</h2>
           <div className="mt-4 flex flex-wrap justify-center gap-3">
             <Link
               href="/registro/solicitante"

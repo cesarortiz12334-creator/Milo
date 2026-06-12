@@ -115,7 +115,7 @@ export default async function MisCampanasPage({
               ¡Campaña creada! Queda pendiente hasta que la veterinaria confirme
               el caso.
               {revision
-                ? " Como supera $200.000, además pasará por revisión del equipo Milo antes de publicarse."
+                ? " Como supera $200.000, además pasará por revisión del equipo MiloFund antes de publicarse."
                 : ""}
             </Mensaje>
           )}

@@ -47,7 +47,7 @@ export default function OpcionesDevolucion({
         </li>
 
         <li className="rounded-xl border border-black/10 p-3">
-          <p className="font-semibold text-dark">B · Crédito Milo</p>
+          <p className="font-semibold text-dark">B · Crédito MiloFund</p>
           <p className="text-muted">
             Tu aporte queda como crédito para usar cuando quieras (opción por
             defecto).

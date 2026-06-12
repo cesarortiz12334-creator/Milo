@@ -68,7 +68,7 @@ export default async function TransparenciaPage() {
           Transparencia
         </h1>
         <p className="mx-auto mt-3 max-w-2xl text-center text-muted">
-          En Milo cada peso es trazable. Esto es lo que ha logrado la comunidad.
+          En MiloFund cada peso es trazable. Esto es lo que ha logrado la comunidad.
         </p>
 
         {/* 1. Números */}
@@ -95,7 +95,7 @@ export default async function TransparenciaPage() {
             <div className="self-center text-2xl text-primary" aria-hidden="true">→</div>
             <div className="flex-1 rounded-2xl border border-primary/30 bg-primary-soft/30 p-5 text-center">
               <p className="text-3xl" aria-hidden="true">🟠</p>
-              <p className="mt-1 font-heading font-bold text-dark">Milo</p>
+              <p className="mt-1 font-heading font-bold text-dark">MiloFund</p>
               <p className="text-sm text-muted">6% (IVA incl.) para operar la plataforma</p>
             </div>
             <div className="self-center text-2xl text-primary" aria-hidden="true">→</div>
@@ -116,7 +116,7 @@ export default async function TransparenciaPage() {
             {[
               { i: "📄", t: "RSH tramo 40%", d: "El solicitante acredita su situación con la Cartola del RSH." },
               { i: "🏥", t: "Confirmación de la vet", d: "La veterinaria valida el caso y sube el presupuesto." },
-              { i: "🔎", t: "Revisión manual > $200.000", d: "Las campañas de monto alto pasan por el equipo Milo." },
+              { i: "🔎", t: "Revisión manual > $200.000", d: "Las campañas de monto alto pasan por el equipo MiloFund." },
             ].map((s) => (
               <div key={s.t} className="rounded-2xl bg-white p-5 text-center shadow-sm ring-1 ring-black/5">
                 <div className="text-3xl" aria-hidden="true">{s.i}</div>
@@ -187,7 +187,7 @@ export default async function TransparenciaPage() {
           <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
             <p className="font-heading font-bold text-dark">✉️ Contacto directo</p>
             <p className="mt-1 text-sm text-muted">
-              ¿Dudas o algo no cuadra? Escríbenos a <strong>hola@milo.cl</strong> y el
+              ¿Dudas o algo no cuadra? Escríbenos a <strong>hola@milofund.cl</strong> y el
               equipo te responde.
             </p>
           </div>

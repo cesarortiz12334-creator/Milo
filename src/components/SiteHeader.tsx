@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getUsuarioActual } from "@/lib/auth";
+import UserMenu from "@/components/UserMenu";
 
 export default async function SiteHeader() {
   const usuario = await getUsuarioActual();
@@ -8,7 +9,7 @@ export default async function SiteHeader() {
     <header className="sticky top-0 z-10 border-b border-black/5 bg-warm-white/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <Link href="/" className="font-heading text-2xl font-extrabold text-primary">
-          Milo
+          MiloFund
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2">
           <Link
@@ -48,35 +49,11 @@ export default async function SiteHeader() {
             Historias
           </Link>
           {usuario ? (
-            <>
-              {usuario.role === "solicitante" && (
-                <Link
-                  href="/mis-campanas"
-                  className="hidden rounded-full px-4 py-2 text-sm font-semibold text-dark transition hover:bg-primary-soft/40 sm:inline-block"
-                >
-                  Mis campañas
-                </Link>
-              )}
-              {usuario.role === "veterinaria" && (
-                <Link
-                  href="/veterinaria"
-                  className="hidden rounded-full px-4 py-2 text-sm font-semibold text-dark transition hover:bg-primary-soft/40 sm:inline-block"
-                >
-                  Mi panel
-                </Link>
-              )}
-              <span className="hidden text-sm text-muted sm:inline">
-                {usuario.email}
-              </span>
-              <form action="/auth/signout" method="post">
-                <button
-                  type="submit"
-                  className="rounded-full px-4 py-2 text-sm font-semibold text-dark transition hover:bg-primary-soft/40"
-                >
-                  Salir
-                </button>
-              </form>
-            </>
+            <UserMenu
+              nombre={usuario.nombre}
+              email={usuario.email}
+              role={usuario.role}
+            />
           ) : (
             <>
               <Link

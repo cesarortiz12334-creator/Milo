@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Milo — Ayuda a una mascota a recuperarse";
+export const alt = "MiloFund — Ayuda a una mascota a recuperarse";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -19,7 +19,7 @@ export default function OpenGraphImage() {
         }}
       >
         <div style={{ display: "flex", fontSize: 52, fontWeight: 800, color: "#F97316" }}>
-          Milo
+          MiloFund
         </div>
         <div
           style={{

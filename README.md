@@ -1,4 +1,4 @@
-# Milo 🐾
+# MiloFund 🐾
 
 Plataforma web chilena de **financiamiento colectivo para atención veterinaria**.
 Conecta a personas vulnerables (acreditadas con su Cartola Hogar del RSH) con
@@ -21,7 +21,7 @@ veterinarias verificadas y donantes que quieran ayudar.
 | **[CLAUDE.md](CLAUDE.md)** | Reglas de negocio y de seguridad del proyecto. |
 
 **Objetivo:** abre el repo, lee este README, sigue `DEPLOY.md` y deberías tener
-Milo en producción en menos de un día. Sin trámites externos lentos: el RSH del
+MiloFund en producción en menos de un día. Sin trámites externos lentos: el RSH del
 solicitante se valida con su **Cartola Hogar en PDF** (ver DEPLOY.md §4).
 
 ## Inicio rápido (local)
@@ -92,4 +92,4 @@ supabase/migrations/  SQL 001..007 (aplicar en orden)
 Responsable del proyecto: **_[ tu nombre aquí ]_**
 Email: **_[ tu email aquí ]_**
 
-Dudas de negocio (reglas de Milo, RSH, comisión, regla 70%): ver `CLAUDE.md`.
+Dudas de negocio (reglas de MiloFund, RSH, comisión, regla 70%): ver `CLAUDE.md`.

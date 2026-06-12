@@ -78,7 +78,7 @@ export default function DonacionForm({ campanaId }: { campanaId: string }) {
         </div>
         <div className="flex justify-between">
           <dt className="text-muted">
-            Comisión Milo ({Math.round(COMISION_PCT * 100)}% IVA incl.)
+            Comisión MiloFund ({Math.round(COMISION_PCT * 100)}% IVA incl.)
           </dt>
           <dd className="font-semibold text-dark">
             − {formatearCLP(comision)}
@@ -111,7 +111,7 @@ export default function DonacionForm({ campanaId }: { campanaId: string }) {
       </div>
 
       <p className="mt-3 text-center text-xs text-muted">
-        Elige tu medio de pago. Serás redirigido a la pasarela segura; Milo nunca
+        Elige tu medio de pago. Serás redirigido a la pasarela segura; MiloFund nunca
         ve los datos de tu tarjeta. Ambiente de pruebas (sandbox).
       </p>
     </form>

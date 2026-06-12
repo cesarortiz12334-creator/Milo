@@ -1,7 +1,7 @@
 /**
  * Lógica de donaciones (no va en componentes).
  *
- * Interpretación de la comisión: el donante paga el monto que elige; Milo
+ * Interpretación de la comisión: el donante paga el monto que elige; MiloFund
  * retiene el 6% (IVA incluido) como comisión y la campaña recibe el resto (94%
  * neto). El porcentaje SIEMPRE debe mostrarse antes de confirmar (ver CLAUDE.md).
  */
@@ -9,7 +9,7 @@ export const COMISION_PCT = 0.06;
 export const MONTOS_SUGERIDOS = [5000, 10000, 20000, 50000] as const;
 export const MONTO_MINIMO = 1000;
 
-/** Comisión de Milo (6% IVA incl. del monto donado), redondeada a peso entero. */
+/** Comisión de MiloFund (6% IVA incl. del monto donado), redondeada a peso entero. */
 export function calcularComision(monto: number): number {
   return Math.round(monto * COMISION_PCT);
 }
