@@ -13,6 +13,7 @@ import { getCampanaMockById } from "@/lib/mock/campanas";
 import { formatearCLP } from "@/lib/donaciones";
 import { emojiEspecie } from "@/lib/especie";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
+import { getUsuarioActual } from "@/lib/auth";
 
 function diasRestantes(fechaLimite: string | null): number | null {
   if (!fechaLimite) return null;
@@ -73,6 +74,15 @@ export default async function CampanaDetalle({
   const financiada = progreso >= 70;
   const dias = diasRestantes(campana.fecha_limite);
   const configurado = isSupabaseConfigured();
+
+  // El formulario para PUBLICAR actualizaciones solo se muestra a un solicitante
+  // logueado. La autorización REAL (que sea el dueño de ESTA campaña) la hace el
+  // server action `publicarActualizacion`, así que aunque alguien manipule el
+  // HTML no puede publicar en campañas ajenas.
+  // TODO(Supabase): cuando esta página lea la campaña real, exigir además
+  // `usuario?.userId === campana.solicitante_id` para mostrarlo solo al dueño.
+  const usuario = await getUsuarioActual();
+  const puedePublicar = usuario?.role === "solicitante";
 
   return (
     <div className="min-h-screen">
@@ -211,13 +221,23 @@ export default async function CampanaDetalle({
             Actualizaciones
           </h2>
           <p className="mt-1 text-sm text-muted">
-            El dueño de la campaña puede compartir cómo va su mascota; avisamos a
-            los donantes por email.
+            El dueño de la campaña comparte cómo va su mascota; avisamos a los
+            donantes por email.
           </p>
-          {/* TODO(Supabase): listar aquí las actualizaciones reales de la campaña. */}
-          <div className="mt-4 max-w-xl">
-            <ActualizacionForm campanaId={campana.id} configurado={configurado} />
-          </div>
+
+          {/* Lista de actualizaciones: visible para TODOS (es la recompensa del
+              donante: ver que la mascota se recuperó).
+              TODO(Supabase): listar aquí las actualizaciones reales de la campaña. */}
+          <p className="mt-4 text-sm text-muted">
+            Aún no hay actualizaciones publicadas.
+          </p>
+
+          {/* Formulario para PUBLICAR: solo el dueño solicitante. */}
+          {puedePublicar && (
+            <div className="mt-6 max-w-xl">
+              <ActualizacionForm campanaId={campana.id} configurado={configurado} />
+            </div>
+          )}
         </section>
       </main>
       <SiteFooter />
