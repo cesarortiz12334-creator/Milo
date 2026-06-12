@@ -182,7 +182,7 @@ export function tplDonacionRecibida(d: {
         d.mascotaNombre
       )}</strong>:<br/><br/>
       Tu donación: <strong>${formatearCLP(d.monto)}</strong><br/>
-      Comisión Milo (5%): ${formatearCLP(d.comision)}<br/>
+      Comisión Milo (6% IVA incl.): ${formatearCLP(d.comision)}<br/>
       La campaña recibe: <strong>${formatearCLP(d.neto)}</strong><br/><br/>
       Te enviaremos el certificado cuando la campaña cierre.`,
       cta: { texto: "Ver la campaña", url: `${SITE}/campana/${d.campanaId}` },

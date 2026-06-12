@@ -55,7 +55,7 @@ supabase/
 - Toda subida de archivos: validar tipo (PDF/JPG/PNG) y tamaño máximo 5MB.
 - Nunca exponer el RUT del solicitante en ninguna respuesta de API o UI.
 - Nunca exponer la URL firmada de Supabase Storage directamente al cliente.
-- Comisión del 5% siempre visible antes de confirmar donación.
+- Comisión del 6% (IVA incluido) siempre visible antes de confirmar donación.
 - RLS de Supabase activo en TODAS las tablas desde el inicio.
 - Variables de entorno: usar `.env.local` para desarrollo, nunca commitear secrets.
 

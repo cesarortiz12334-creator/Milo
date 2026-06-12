@@ -99,6 +99,22 @@ export const actualizacionSchema = z.object({
   mensaje: z.string().trim().min(1, "Escribe un mensaje.").max(2000),
 });
 
+export const ASUNTOS_CONTACTO = [
+  "Soy donante",
+  "Soy solicitante",
+  "Soy veterinaria",
+  "Prensa",
+  "Tengo un problema",
+  "Otro",
+] as const;
+
+export const contactoSchema = z.object({
+  nombre: z.string().trim().min(1, "Ingresa tu nombre.").max(120),
+  email,
+  asunto: z.enum(ASUNTOS_CONTACTO, { message: "Selecciona un asunto." }),
+  mensaje: z.string().trim().min(1, "Escribe tu mensaje.").max(5000),
+});
+
 export type ResultadoParseo<T> =
   | { ok: true; data: T }
   | { ok: false; error: string };

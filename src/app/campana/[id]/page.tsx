@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import SiteHeader from "@/components/SiteHeader";
@@ -7,6 +8,7 @@ import EstadoBadge from "@/components/EstadoBadge";
 import OpcionesDevolucion from "@/components/campanas/OpcionesDevolucion";
 import ReportarCampanaModal from "@/components/campanas/ReportarCampanaModal";
 import ActualizacionForm from "@/components/campanas/ActualizacionForm";
+import CompartirCampana from "@/components/campanas/CompartirCampana";
 import { getCampanaMockById } from "@/lib/mock/campanas";
 import { formatearCLP } from "@/lib/donaciones";
 import { emojiEspecie } from "@/lib/especie";
@@ -16,6 +18,40 @@ function diasRestantes(fechaLimite: string | null): number | null {
   if (!fechaLimite) return null;
   const ms = new Date(fechaLimite).getTime() - Date.now();
   return Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const c = getCampanaMockById(id);
+  if (!c) return { title: "Campaña no encontrada" };
+
+  const progreso = Math.min(
+    100,
+    Math.round((c.monto_recaudado / c.monto_meta) * 100)
+  );
+  const dias = diasRestantes(c.fecha_limite);
+  const titulo = `Ayuda a ${c.mascota_nombre} — ${c.titulo}`;
+  const cola = `${progreso}% recaudado${
+    dias !== null ? ` · ${dias} días restantes` : ""
+  }.`;
+  const desc = `${c.descripcion ? `${c.descripcion} ` : ""}${cola}`.trim();
+
+  return {
+    title: titulo,
+    description: desc,
+    alternates: { canonical: `/campana/${id}` },
+    openGraph: {
+      type: "article",
+      url: `/campana/${id}`,
+      title: titulo,
+      description: desc,
+    },
+    twitter: { card: "summary_large_image", title: titulo, description: desc },
+  };
 }
 
 export default async function CampanaDetalle({
@@ -94,6 +130,14 @@ export default async function CampanaDetalle({
             )}
 
             <div className="mt-6">
+              <CompartirCampana
+                campanaId={campana.id}
+                titulo={campana.titulo}
+                mascota={campana.mascota_nombre}
+              />
+            </div>
+
+            <div className="mt-4">
               <ReportarCampanaModal campanaId={campana.id} />
             </div>
           </div>

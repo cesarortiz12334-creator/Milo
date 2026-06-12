@@ -18,7 +18,7 @@ const FLUJOS = [
     rol: "Para donantes",
     pasos: [
       { i: "🐾", t: "Elige una campaña que te mueva", d: "Encuentra una mascota que necesite ayuda." },
-      { i: "🔒", t: "Dona de forma segura con Transbank", d: "Comisión del 5% siempre visible antes de pagar." },
+      { i: "🔒", t: "Dona de forma segura", d: "Comisión del 6% (IVA incl.) siempre visible antes de pagar." },
       { i: "📬", t: "Recibe actualizaciones por email", d: "Te contamos cómo evoluciona la mascota." },
     ],
     cta: { href: "/", label: "Ver campañas" },

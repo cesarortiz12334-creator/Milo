@@ -21,7 +21,7 @@ export const estadisticasMock: EstadisticasTransparencia = {
   mascotas_recuperadas: 63,
   campanas_exitosas: 58,
   campanas_no_financiadas: 9,
-  porcentaje_a_vet: 95,
+  porcentaje_a_vet: 94,
   dias_promedio_transferencia: 3,
 };
 

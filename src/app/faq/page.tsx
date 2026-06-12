@@ -20,7 +20,7 @@ const PREGUNTAS = [
   },
   {
     p: "¿Cuánto cobra Milo por donación?",
-    r: "Milo retiene el 5% de cada donación para cubrir los costos operativos de la plataforma. Ese porcentaje siempre es visible antes de confirmar tu donación. El 95% restante va directamente a la veterinaria.",
+    r: "Milo retiene el 6% (IVA incluido) de cada donación para cubrir los costos operativos de la plataforma. Ese porcentaje siempre es visible antes de confirmar tu donación. El 94% restante va directamente a la veterinaria.",
   },
   {
     p: "¿Puedo pedir devolución de mi donación?",

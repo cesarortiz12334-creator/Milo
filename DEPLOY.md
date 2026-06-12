@@ -30,6 +30,7 @@ valida su RSH subiendo su Cartola Hogar en PDF (ver §4).
    006_seguridad.sql        → tabla auditoría inmutable + trigger monto inmutable
    007_cartola_rsh.sql      → cartola RSH del solicitante + revisión manual >$200k
    008_reportes_y_transparencia.sql → tabla reportes + vista transferencias_publicas
+   009_mensajes_contacto.sql → tabla mensajes_contacto (formulario de contacto)
    ```
    Opción B (CLI): `npx supabase link --project-ref <ref>` y luego
    `npx supabase db push`.
@@ -38,7 +39,8 @@ valida su RSH subiendo su Cartola Hogar en PDF (ver §4).
    con esa visibilidad.
 5. **Verifica RLS** (Authentication → Policies): todas las tablas (`users`,
    `solicitantes`, `veterinarias`, `mascotas`, `campanas`, `donaciones`,
-   `actualizaciones`, `auditoria`, `reportes`) deben tener "RLS enabled".
+   `actualizaciones`, `auditoria`, `reportes`, `mensajes_contacto`) deben tener
+   "RLS enabled".
 6. **Auth → Providers:** habilita **Email**. Para **Google** (donantes), ver §3.
 7. **Auth → URL Configuration:**
    - `Site URL` = tu dominio de producción (ej. `https://milo.cl`).
@@ -110,6 +112,18 @@ sube su **Cartola Hogar del RSH** en PDF, y el servidor la valida automáticamen
   **https://www.transbankdevelopers.cl/**, obtén tu *commerce code* y *api key*, y
   define `TBK_ENVIRONMENT=production`, `TBK_COMMERCE_CODE=<...>`, `TBK_API_KEY=<...>`.
 
+### 5.1 Mercado Pago (segundo medio de pago — Checkout Pro)
+
+En el flujo de donación hay dos botones: **Webpay** y **Mercado Pago**.
+
+1. En el **panel de desarrolladores de Mercado Pago** crea una aplicación y copia
+   el **Access Token de PRUEBA** (`TEST-...`) → `MERCADOPAGO_ACCESS_TOKEN`. Así el
+   checkout funciona en **sandbox**. Para producción, usa el token productivo.
+2. Sin el token, el botón de Mercado Pago responde "aún no está configurado" y el
+   donante puede usar Webpay.
+3. Rutas: `api/mercadopago/crear` (crea la preferencia y redirige al checkout) y
+   `api/mercadopago/retorno` (procesa el regreso). Config en `lib/mercadopago/`.
+
 ---
 
 ## 6. Upstash Redis (rate limiting distribuido)
@@ -174,16 +188,20 @@ La capa demo funciona, pero estos puntos deben completarse para producción real
 
 ## 9. Checklist final antes de producción
 
-- [ ] Migraciones **001→008** aplicadas y verificadas en Supabase.
+- [ ] Migraciones **001→009** aplicadas y verificadas en Supabase.
 - [ ] Buckets `mascotas` (público) y `documentos` (privado) existen.
 - [ ] RLS activo en todas las tablas (incluida `auditoria`).
 - [ ] Email + Google habilitados en Supabase Auth; redirect URLs en la allowlist.
 - [ ] Dominio verificado en Resend; `RESEND_API_KEY` + `MILO_FROM_EMAIL` cargadas.
 - [ ] Patrones de `src/lib/cartola.ts` **calibrados con cartolas RSH reales**.
 - [ ] `TBK_ENVIRONMENT=production` con commerce code + api key reales.
+- [ ] `MERCADOPAGO_ACCESS_TOKEN` cargado (sandbox primero, luego productivo).
 - [ ] `CRON_SECRET` cargada; cron visible en Vercel → Settings → Cron Jobs.
-- [ ] `NEXT_PUBLIC_SITE_URL` apunta al dominio real.
+- [ ] **`NEXT_PUBLIC_SITE_URL` reemplazado por el dominio real** (afecta Open
+      Graph, sitemap y botones de compartir; hoy es placeholder `milofund.com`).
 - [ ] (Recomendado) Upstash configurado y `rate-limit.ts` adaptado.
 - [ ] Los `TODO(Supabase)` del §8 implementados.
+- [ ] **Contenidos legales** (/terminos, /privacidad, /cookies) redactados por un
+      abogado; revisar la **bandeja `mensajes_contacto`** (no se envían emails).
 - [ ] Pruebas de [TESTING.md](TESTING.md) pasando.
 - [ ] `npm run build` sin errores en Vercel.

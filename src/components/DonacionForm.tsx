@@ -68,7 +68,7 @@ export default function DonacionForm({ campanaId }: { campanaId: string }) {
       {/* Monto real que se envía a Webpay */}
       <input type="hidden" name="monto" value={valido ? monto : ""} />
 
-      {/* Desglose — la comisión del 5% SIEMPRE visible antes de confirmar */}
+      {/* Desglose — la comisión del 6% SIEMPRE visible antes de confirmar */}
       <dl className="mt-4 space-y-1.5 rounded-xl bg-warm-white p-4 text-sm">
         <div className="flex justify-between">
           <dt className="text-muted">Tu donación</dt>
@@ -77,7 +77,9 @@ export default function DonacionForm({ campanaId }: { campanaId: string }) {
           </dd>
         </div>
         <div className="flex justify-between">
-          <dt className="text-muted">Comisión Milo ({COMISION_PCT * 100}%)</dt>
+          <dt className="text-muted">
+            Comisión Milo ({Math.round(COMISION_PCT * 100)}% IVA incl.)
+          </dt>
           <dd className="font-semibold text-dark">
             − {formatearCLP(comision)}
           </dd>
@@ -90,17 +92,27 @@ export default function DonacionForm({ campanaId }: { campanaId: string }) {
         </div>
       </dl>
 
-      <button
-        type="submit"
-        disabled={!valido}
-        className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 font-heading text-base font-bold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {valido ? `Donar ${formatearCLP(monto)} con Webpay` : "Ingresa un monto"}
-      </button>
+      <div className="mt-4 space-y-2">
+        <button
+          type="submit"
+          disabled={!valido}
+          className="inline-flex w-full items-center justify-center rounded-full bg-primary px-4 py-3 font-heading text-base font-bold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {valido ? `Pagar ${formatearCLP(monto)} con Webpay` : "Ingresa un monto"}
+        </button>
+        <button
+          type="submit"
+          formAction="/api/mercadopago/crear"
+          disabled={!valido}
+          className="inline-flex w-full items-center justify-center rounded-full bg-[#009EE3] px-4 py-3 font-heading text-base font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Pagar con Mercado Pago
+        </button>
+      </div>
 
       <p className="mt-3 text-center text-xs text-muted">
-        Serás redirigido a Webpay de Transbank para pagar de forma segura. Milo
-        nunca ve los datos de tu tarjeta. Ambiente de pruebas (sandbox).
+        Elige tu medio de pago. Serás redirigido a la pasarela segura; Milo nunca
+        ve los datos de tu tarjeta. Ambiente de pruebas (sandbox).
       </p>
     </form>
   );

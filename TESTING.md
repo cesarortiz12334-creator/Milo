@@ -17,7 +17,7 @@ funciona contra el sandbox sin backend.
 
 **Pasos**
 1. Abre una campaña `activa` → botón **Donar**.
-2. Elige un monto → verifica el **desglose de comisión 5%** antes de confirmar.
+2. Elige un monto → verifica el **desglose de comisión 6% (IVA incl.)** antes de confirmar.
 3. **Donar con Webpay** → te redirige a Webpay sandbox.
 4. Paga con una **tarjeta de prueba**:
    - VISA (aprueba): `4051 8856 0044 6623`, CVV `123`, cualquier fecha futura.
@@ -163,6 +163,45 @@ nosniff`, HSTS presente, y **sin** `X-Powered-By`.
   el dueño → rechazado.
 
 **Páginas públicas (smoke):** `/como-funciona`, `/faq`, `/sobre-nosotros`,
-`/transparencia`, `/veterinarias`, `/terminos`, `/privacidad` → todas **200**. En
-`/transparencia` la tabla sale de la vista `transferencias_publicas`. En
-`/veterinarias`, el buscador filtra por nombre o comuna.
+`/transparencia`, `/veterinarias`, `/terminos`, `/privacidad`, `/cookies`,
+`/contacto` → todas **200**. En `/transparencia` la tabla sale de la vista
+`transferencias_publicas`. En `/veterinarias`, el buscador filtra por nombre o comuna.
+
+---
+
+## 9. Plataforma operativa (contacto, OG, Mercado Pago, errores, compartir)
+
+**Formulario de contacto**
+- Envía el formulario en `/contacto` → mensaje "Recibimos tu mensaje. Respondemos
+  en menos de 48 horas hábiles." y una fila nueva en `mensajes_contacto`. **No se
+  envía ningún email.** Más de 5 envíos/hora por IP → bloqueado.
+
+**Comisión 6%**
+- En el desglose de donación, la comisión es **6% (IVA incl.)** y la campaña
+  recibe el **94%** (ej.: $10.000 → comisión $600, neto $9.400).
+
+**Open Graph / compartir**
+- `GET /opengraph-image` y `GET /campana/<id>/opengraph-image` → **200 image/png**.
+- Pega un link de campaña en WhatsApp/Facebook → debe mostrar título con la mascota,
+  descripción y la imagen. Verifica `<meta property="og:*">` y `twitter:card` en el HTML.
+- Los botones **WhatsApp / Facebook / X / Copiar link** del detalle usan
+  `NEXT_PUBLIC_SITE_URL` como base (revisar que apunte al dominio real).
+
+**Mercado Pago (sandbox)**
+- Con `MERCADOPAGO_ACCESS_TOKEN` de prueba: clic en **"Pagar con Mercado Pago"** →
+  redirige al Checkout Pro sandbox. Paga con una tarjeta de prueba de Mercado Pago.
+- **Esperado:** vuelve a `/api/mercadopago/retorno` → página de resultado
+  (aprobada/rechazada). Sin token configurado → mensaje "aún no está configurado".
+
+**Páginas de error**
+- Visita una URL inexistente → **404** "Esta página no existe" con links.
+- Fuerza un error de render → `error.tsx` "Algo salió mal" con botón **Reintentar**.
+- Navegación entre páginas → se ve el **skeleton** de `loading.tsx`.
+
+**SEO**
+- `GET /robots.txt` → permite `/`, bloquea `/veterinaria`, `/campanas/nueva`,
+  `/mis-campanas`, `/api/`. `GET /sitemap.xml` → XML con las rutas públicas.
+
+**Banner de cookies**
+- Primera visita → aparece el banner abajo. Clic en **"Entendido"** → desaparece y
+  no vuelve (queda `milo_cookies_ok` en localStorage).

@@ -96,13 +96,13 @@ export default async function TransparenciaPage() {
             <div className="flex-1 rounded-2xl border border-primary/30 bg-primary-soft/30 p-5 text-center">
               <p className="text-3xl" aria-hidden="true">🟠</p>
               <p className="mt-1 font-heading font-bold text-dark">Milo</p>
-              <p className="text-sm text-muted">5% para operar la plataforma</p>
+              <p className="text-sm text-muted">6% (IVA incl.) para operar la plataforma</p>
             </div>
             <div className="self-center text-2xl text-primary" aria-hidden="true">→</div>
             <div className="flex-1 rounded-2xl border border-success/30 bg-success-soft/50 p-5 text-center">
               <p className="text-3xl" aria-hidden="true">🏥</p>
               <p className="mt-1 font-heading font-bold text-dark">Veterinaria verificada</p>
-              <p className="text-sm text-muted">Recibe el 95%</p>
+              <p className="text-sm text-muted">Recibe el 94%</p>
             </div>
           </div>
         </section>

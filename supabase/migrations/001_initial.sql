@@ -81,7 +81,7 @@ create table public.donaciones (
   campana_id      uuid not null references public.campanas (id) on delete cascade,
   donante_id      uuid references public.users (id) on delete set null,
   monto           integer not null check (monto > 0),  -- CLP
-  comision        integer not null default 0,          -- 5% Milo
+  comision        integer not null default 0,          -- 6% Milo (IVA incl.)
   estado          donacion_estado not null default 'pendiente',
   certificado_url text,
   credito_milo    boolean not null default false,      -- regla 70%: crédito Milo

@@ -30,6 +30,12 @@ export default async function SiteHeader() {
             Transparencia
           </Link>
           <Link
+            href="/contacto"
+            className="hidden rounded-full px-3 py-2 text-sm font-semibold text-dark transition hover:bg-primary-soft/40 lg:inline-block"
+          >
+            Contacto
+          </Link>
+          <Link
             href="/exitos"
             className="hidden rounded-full px-3 py-2 text-sm font-semibold text-dark transition hover:bg-primary-soft/40 sm:inline-block"
           >

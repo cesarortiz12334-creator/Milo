@@ -1,5 +1,6 @@
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import AvisoLegal from "@/components/AvisoLegal";
 
 const SECCIONES = [
   { t: "1. Qué datos recopilamos", d: "Email, nombre, RUT (hasheado), datos de la Cartola RSH y de las campañas. Nunca almacenamos datos de tarjetas (los procesa Transbank). [Por completar.]" },
@@ -19,10 +20,7 @@ export default function PrivacidadPage() {
         <h1 className="font-heading text-3xl font-extrabold text-dark">
           Política de privacidad
         </h1>
-        <p className="mt-2 text-sm text-muted">
-          Última actualización: [fecha]. Borrador — debe revisarlo un abogado antes
-          de publicar.
-        </p>
+        <AvisoLegal />
         <div className="mt-8 space-y-6">
           {SECCIONES.map((s) => (
             <section key={s.t}>

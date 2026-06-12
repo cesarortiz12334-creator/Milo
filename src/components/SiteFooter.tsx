@@ -6,6 +6,7 @@ const NAV = [
   { href: "/veterinarias", label: "Veterinarias" },
   { href: "/exitos", label: "Historias de éxito" },
   { href: "/transparencia", label: "Transparencia" },
+  { href: "/contacto", label: "Contacto" },
 ];
 
 const REDES = [
@@ -27,7 +28,7 @@ export default function SiteFooter() {
               familias vulnerables.
             </p>
             <p className="mt-2 text-sm text-muted">
-              Comisión 5% siempre visible · Pagos con Transbank Webpay.
+              Comisión 6% (IVA incl.) siempre visible · Pagos seguros.
             </p>
           </div>
 
@@ -55,6 +56,11 @@ export default function SiteFooter() {
               <li>
                 <Link href="/privacidad" className="text-muted transition hover:text-primary">
                   Política de privacidad
+                </Link>
+              </li>
+              <li>
+                <Link href="/cookies" className="text-muted transition hover:text-primary">
+                  Política de cookies
                 </Link>
               </li>
             </ul>
