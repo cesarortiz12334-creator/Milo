@@ -18,6 +18,12 @@ export default async function SiteHeader() {
             Cómo funciona
           </Link>
           <Link
+            href="/faq"
+            className="hidden rounded-full px-3 py-2 text-sm font-semibold text-dark transition hover:bg-primary-soft/40 lg:inline-block"
+          >
+            FAQ
+          </Link>
+          <Link
             href="/veterinarias"
             className="hidden rounded-full px-3 py-2 text-sm font-semibold text-dark transition hover:bg-primary-soft/40 lg:inline-block"
           >

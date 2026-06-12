@@ -3,6 +3,7 @@ import Link from "next/link";
 const NAV = [
   { href: "/", label: "Inicio" },
   { href: "/como-funciona", label: "Cómo funciona" },
+  { href: "/faq", label: "Preguntas frecuentes" },
   { href: "/veterinarias", label: "Veterinarias" },
   { href: "/exitos", label: "Historias de éxito" },
   { href: "/transparencia", label: "Transparencia" },
