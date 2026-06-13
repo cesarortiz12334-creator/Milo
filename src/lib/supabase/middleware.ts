@@ -66,6 +66,16 @@ export async function aplicarSeguridadYSesion(
         data: { user },
       } = await supabase.auth.getUser();
 
+      // Gate de rutas protegidas: sin sesión → /login (barrera server-side dura,
+      // además del control en cada página/acción). Evita servir el cascarón de
+      // páginas protegidas a clientes anónimos.
+      const path = request.nextUrl.pathname;
+      const PROTEGIDAS = ["/perfil", "/campanas/nueva", "/mis-campanas", "/veterinaria"];
+      if (!user && PROTEGIDAS.some((r) => path === r || path.startsWith(`${r}/`))) {
+        const url = new URL("/login", request.url);
+        return NextResponse.redirect(url);
+      }
+
       // Expiración de sesión por inactividad.
       if (user) {
         const previa = request.cookies.get("milo_actividad")?.value;

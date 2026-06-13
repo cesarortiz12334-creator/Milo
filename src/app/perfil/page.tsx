@@ -13,6 +13,9 @@ import type { CampanaEstado } from "@/types";
 
 export const metadata: Metadata = { title: "Mi perfil" };
 
+// Página protegida: debe evaluarse por-petición (sesión + datos del usuario).
+export const dynamic = "force-dynamic";
+
 const ROL_LABEL: Record<string, string> = {
   solicitante: "Solicitante",
   donante: "Donante",

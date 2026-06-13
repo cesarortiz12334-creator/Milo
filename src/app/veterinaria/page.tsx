@@ -15,6 +15,9 @@ import {
 } from "@/lib/mock/casos";
 import type { CampanaEstado } from "@/types";
 
+// Página protegida: evaluar sesión/rol por-petición (no prerender estático).
+export const dynamic = "force-dynamic";
+
 async function obtenerCasos(
   vetId: string,
   estado: CampanaEstado

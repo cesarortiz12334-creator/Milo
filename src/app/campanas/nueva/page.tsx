@@ -11,6 +11,9 @@ import {
   type VeterinariaOpcion,
 } from "@/lib/mock/veterinarias";
 
+// Página protegida: evaluar sesión/rol por-petición (no prerender estático).
+export const dynamic = "force-dynamic";
+
 async function obtenerVeterinarias(): Promise<VeterinariaOpcion[]> {
   if (!isSupabaseConfigured()) return veterinariasMock;
   try {
